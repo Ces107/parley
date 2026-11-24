@@ -36,7 +36,6 @@
     'You each have a private brief: who you are, what you know, what you would rather keep quiet.',
     'All of you but one tell only the truth. You may decline to answer a question once; asked again, you answer it.',
     'One of you sent the paper. That person may lie.',
-    'No accents, no acting: a name and a motive are enough.',
     'Use the notebook sheet. Times, places and exact wording matter.'
   ];
 

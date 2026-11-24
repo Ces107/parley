@@ -42,7 +42,7 @@
       '<div class="sheet" style="margin-top:1.2rem">' + D.PREMISE.map(p => '<p class="lead" style="max-width:none">' + esc(p) + '</p>').join('') + '</div>' + nextBtn('The rules') + '</div>';
   }
   function vRules() {
-    return '<div class="stage narrow">' + kick('How it works') + '<h2>Five rules</h2><div class="sheet" style="margin-top:1.2rem">' + list(D.RULES) + '</div>' + nextBtn('Hand out the briefs') + '</div>';
+    return '<div class="stage narrow">' + kick('How it works') + '<h2>The rules</h2><div class="sheet" style="margin-top:1.2rem">' + list(D.RULES) + '</div>' + nextBtn('Hand out the briefs') + '</div>';
   }
   function vBriefs() {
     const seats = names().map((nm, i) => '<div class="seat"><h3>' + esc(nm) + '</h3><div class="qr">' + K.qrSvg(K.seatUrl('leak', S.room, i, S.n)) + '</div>' + (V === 'rehearsal' ? '<a class="lab" target="_blank" href="' + esc(K.seatUrl('leak', S.room, i, S.n)) + '">Open in a new tab</a>' : '') + '</div>').join('');
