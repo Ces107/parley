@@ -2,7 +2,9 @@
 (function () {
   'use strict';
   const D = window.COUNCIL, K = window.K, $ = K.$, esc = K.esc;
-  const LS = K.store('parley.council.v1');
+  const V = K.variant();
+  const LS = K.store('parley.council.v2.' + V);
+  const GID = D.GAUGES.map(g => g.id);
   const app = $('#app');
   const T = { charter: 240, crisis: 210, emergency: 90, write: 360, review: 300 };
   let S = LS.get();
@@ -10,11 +12,11 @@
   function fresh() {
     return {
       v: 1, room: K.newCode(5), names: ['', '', '', ''], n: 0, phase: 'setup', i: 0, sub: 'read', turn: 0,
-      g: { treasury: 5, trust: 5, reef: 5, standing: 5 }, f: {}, flags: {}, picks: {}, order: [], reck: null,
+      g: GID.reduce((o, id) => { o[id] = 5; return o; }, {}), f: {}, flags: {}, picks: {}, order: [], reck: null,
       emergencies: 0, fell: false, zero: null, timer: null, started: 0, delta: null, ask: null, markers: [2, 2, 2, 2], sure: false, bill: false, hold: false
     };
   }
-  if (!S || S.v !== 1) S = fresh();
+  if (!S || S.v !== 1 || !S.g || GID.some(id => S.g[id] == null)) S = fresh();
   const save = () => LS.set(S);
 
   const clock = K.Countdown({ id: 'main', get: () => S.timer, set: t => { S.timer = t; save(); } });
@@ -62,12 +64,12 @@
     const inputs = [0, 1, 2, 3].map(i =>
       '<input type="text" maxlength="14" data-name="' + i + '" placeholder="' + (i < 3 ? 'Name' : 'Name (optional)') + '" value="' + esc(S.names[i]) + '">').join('');
     return '<div class="stage narrow"><div class="kicker"><span>90 minutes · 3 or 4 players</span></div><h1>The Council</h1>' +
-      '<p class="lead" style="margin-top:1rem">A new country, one year, nine decisions. Bring pencils, paper and two coins each.</p>' +
+      '<p class="lead" style="margin-top:1rem">' + esc(D.META.lead) + '</p>' +
       '<div class="sheet" style="margin-top:1.4rem"><div class="lab" style="margin-bottom:.6rem">Who is at the table, in seating order</div><div class="row">' + inputs + '</div>' +
-      '<div class="btns"><button class="btn go" data-act="begin" data-next>Begin →</button><a class="btn ghost" href="print.html?g=council" target="_blank">Print the minister’s sheet</a></div></div></div>';
+      '<div class="btns"><button class="btn go" data-act="begin" data-next>Begin →</button><a class="btn ghost" href="print.html?g=council&v=' + V + '" target="_blank">Print the minister’s sheet</a></div></div></div>';
   }
   function vRules() {
-    return '<div class="stage narrow"><div class="kicker"><span>How it works</span></div><h2>The Republic of Skerry</h2>' +
+    return '<div class="stage narrow"><div class="kicker"><span>How it works</span></div><h2>' + esc(D.META.title) + '</h2>' +
       '<div class="sheet" style="margin-top:1.2rem"><ol class="steps">' + D.RULES.map(r => '<li>' + esc(r) + '</li>').join('') + '</ol></div>' + nextBtn('The Charter') + '</div>';
   }
   function vCharter() {
@@ -84,7 +86,7 @@
   }
   function vLots() {
     const pf = D.portfoliosFor(S.room, S.n);
-    const seats = names().map((nm, i) => '<div class="seat"><h3>' + esc(nm) + '</h3><div class="qr">' + K.qrSvg(K.seatUrl('council', S.room, i, S.n)) + '</div></div>').join('');
+    const seats = names().map((nm, i) => '<div class="seat"><h3>' + esc(nm) + '</h3><div class="qr">' + K.qrSvg(K.seatUrl('council', S.room, i, S.n)) + '</div>' + (V === 'rehearsal' ? '<a class="lab" target="_blank" href="' + esc(K.seatUrl('council', S.room, i, S.n)) + '">Open in a new tab</a>' : '') + '</div>').join('');
     return '<div class="stage"><div class="kicker"><span>The Charter is signed</span></div><h2>Now find out who you are.</h2>' +
       '<p class="lead" style="margin:.8rem 0 1.2rem">Scan your own code. Read it once, tell nobody, put the phone face down.</p>' +
       '<div class="seats">' + seats + '</div>' +
@@ -112,7 +114,7 @@
     }
     return '<div class="stage">' + gauges(false) + kicker(label) + '<h2>' + esc(c.title) + '</h2>' +
       '<div class="split"><div><p class="lead">' + esc(c.text(S.f)) + '</p>' +
-      (S.bill && S.phase === 'crisis' ? '<div class="note"><span class="lab">Quarter day</span>The teachers, the nurses and the ferry crew have been paid. Treasury −1.</div>' : '') +
+      (S.bill && S.phase === 'crisis' ? '<div class="note"><span class="lab">Quarter day</span>' + esc(D.META.bill) + ' ' + esc(gname(GID[0])) + ' −1.</div>' : '') +
       (guard ? '<div class="note" style="border-color:var(--red)"><span class="lab">The Charter</span>' + esc(guard.why) + '</div>' : '') +
       timerBox() + phraseStrip('cr' + id) + '</div>' +
       '<div><div class="opts col">' + c.options.map((o, k) => '<button class="opt" data-act="pick" data-id="' + o.id + '"><span class="k">' + 'ABC'[k] + '</span><b>' + esc(o.label) + '</b><span>' + esc(o.pitch) + '</span>' + fxLine(o.fx) + (needs(o) ? '<span class="lab red">Unanimous only</span>' : '') + '</button>').join('') + '</div>' + ask + '</div></div></div>';
@@ -131,9 +133,10 @@
     return lines;
   }
   function verdict() {
-    if (S.fell) return 'The government fell before the year was out.';
+    const W = D.META.verdicts;
+    if (S.fell) return W.fell;
     const low = Math.min.apply(null, D.GAUGES.map(g => S.g[g.id]));
-    return low <= 0 ? 'The Republic did not see its first anniversary.' : low <= 2 ? 'The Republic of Skerry enters its second year. Just.' : 'The Republic of Skerry enters its second year.';
+    return low <= 0 ? W.dead : low <= 2 ? W.just : W.ok;
   }
   function vEpilogue() {
     return '<div class="stage narrow">' + gauges(false) + kicker('One year on') + '<h2>' + esc(verdict()) + '</h2>' +
@@ -149,7 +152,7 @@
   }
   function vReveal() {
     const rows = scores(), best = Math.max.apply(null, rows.map(r => r.total));
-    const vacant = ['fin', 'home', 'sea', 'for'].filter(p => D.portfoliosFor(S.room, S.n).indexOf(p) < 0);
+    const vacant = Object.keys(D.PORTFOLIOS).filter(p => D.portfoliosFor(S.room, S.n).indexOf(p) < 0);
     return '<div class="stage">' + kicker('The sealed briefs') + '<h2>Who was working for whom</h2>' +
       '<div class="sheet" style="margin-top:1.2rem"><table class="score"><tr><th>Minister</th><th>Gauge</th><th>Private promise</th><th>Markers kept</th><th></th></tr>' +
       rows.map(r => '<tr class="' + (r.total === best ? 'top' : '') + '"><td><b>' + esc(r.name) + '</b><br><span class="lab">' + esc(r.P.title) + '</span></td>' +
@@ -200,16 +203,16 @@
         S.i++; S.sub = 'read'; S.turn++; S.bill = false; setTimer(T.crisis);
         if (D.BILLS.indexOf(S.i) >= 0) {
           // Quarter day: the wages fall due before this dispatch is read.
-          S.g.treasury = clamp(S.g.treasury - 1); S.bill = true;
-          if (S.g.treasury <= 0) {
+          S.g[GID[0]] = clamp(S.g[GID[0]] - 1); S.bill = true;
+          if (S.g[GID[0]] <= 0) {
             S.emergencies++;
             if (S.emergencies >= 2) { S.fell = true; S.phase = 'epilogue'; return; }
-            S.zero = 'treasury'; S.back = 'crisis'; S.hold = true; S.phase = 'emergency'; setTimer(T.emergency);
+            S.zero = GID[0]; S.back = 'crisis'; S.hold = true; S.phase = 'emergency'; setTimer(T.emergency);
           }
         }
       }
       else {
-        const order = ['treasury', 'trust', 'reef', 'standing'];
+        const order = GID;
         S.reck = order.slice().sort((a, b) => S.g[a] - S.g[b] || order.indexOf(a) - order.indexOf(b))[0];
         S.phase = 'reckoning'; S.sub = 'read'; S.turn++; setTimer(T.crisis);
       }
@@ -286,6 +289,8 @@
   $('#new').addEventListener('click', () => { if (S.sure) { clock.stop(); S = fresh(); } else { S.sure = true; } save(); render(); });
   $('#full').addEventListener('click', K.fullscreen);
 
+  $('#tag').textContent = V === 'class' ? 'Class' : 'Rehearsal';
+  $('#tag').className = 'tag ' + V;
   K.keepAwake();
   K.sessionClock(() => S.started, 90);
   render();

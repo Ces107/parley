@@ -115,11 +115,18 @@
     const q = root.qrcode(0, 'M'); q.addData(text); q.make();
     return q.createSvgTag({ cellSize: 4, margin: 1, scalable: true });
   }
+  // Every game has two complete scenarios: "rehearsal" for trying it out, "class" for the night itself.
+  function variant() { return params().v === 'class' ? 'class' : 'rehearsal'; }
+  // Writes the script tag for a game's scenario while the page is still loading.
+  function need(game) {
+    if (game !== 'council' && game !== 'leak') return;
+    document.write('<script src="assets/' + game + '.' + variant() + '.js"><\/script>');
+  }
   // Names travel in the URL fragment only: a fragment is never sent to any server.
   function seatUrl(game, room, seat, n, extra, names) {
     const u = new URL('seat.html', location.href);
     u.search = ''; u.hash = '';
-    u.searchParams.set('g', game); u.searchParams.set('r', room);
+    u.searchParams.set('g', game); u.searchParams.set('v', variant()); u.searchParams.set('r', room);
     u.searchParams.set('s', String(seat)); u.searchParams.set('n', String(n));
     Object.keys(extra || {}).forEach(k => { if (extra[k] != null) u.searchParams.set(k, String(extra[k])); });
     if (names && names.length) u.hash = names.map(encodeURIComponent).join('|');
@@ -214,5 +221,5 @@
   ];
   function phrases(seed, n) { return sample(PHRASES, n || 3, rng('ph' + seed)); }
 
-  root.K = { hash, rng, shuffle, sample, newCode, $, $$, esc, params, fmt, store, beep, Countdown, qrSvg, seatUrl, hashNames, fullscreen, keepAwake, sessionClock, open, BROKERS, PHRASES, phrases };
+  root.K = { hash, rng, shuffle, sample, newCode, $, $$, esc, params, fmt, store, beep, Countdown, qrSvg, seatUrl, hashNames, variant, need, fullscreen, keepAwake, sessionClock, open, BROKERS, PHRASES, phrases };
 })(typeof window !== 'undefined' ? window : globalThis);

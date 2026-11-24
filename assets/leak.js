@@ -2,14 +2,15 @@
 (function () {
   'use strict';
   const D = window.LEAK, K = window.K, $ = K.$, esc = K.esc;
-  const LS = K.store('parley.leak.v1');
+  const V = K.variant(), M = D.META;
+  const LS = K.store('parley.leak.v2.' + V);
   const app = $('#app');
   const T = { read: 300, statement: 210, round: 540, accuse: 120, card: 210, write: 360, review: 300 };
   let S = LS.get();
 
   function fresh() {
     return { v: 1, room: K.newCode(5), names: ['', '', '', ''], n: 0, phase: 'setup', i: 0, timer: null, started: 0,
-      show: [], hint: 0, acc: {}, out: { grange: false, monday: false }, votes: {}, sub: 'write', sure: false };
+      show: [], hint: 0, acc: {}, out: {}, votes: {}, sub: 'write', sure: false };
   }
   if (!S || S.v !== 1) S = fresh();
   const save = () => LS.set(S);
@@ -32,19 +33,19 @@
   function vSetup() {
     const inputs = [0, 1, 2, 3].map(i => '<input type="text" maxlength="14" data-name="' + i + '" placeholder="' + (i < 3 ? 'Name' : 'Name (optional)') + '" value="' + esc(S.names[i]) + '">').join('');
     return '<div class="stage narrow">' + kick('90 minutes · 3 or 4 players') + '<h1>The Leak</h1>' +
-      '<p class="lead" style="margin-top:1rem">A confidential note reached a newspaper. One of you sent it. Bring pencils; print the case notebook and the exhibits if you can.</p>' +
+      '<p class="lead" style="margin-top:1rem">' + esc(M.lead) + '</p>' +
       '<div class="sheet" style="margin-top:1.4rem"><div class="lab" style="margin-bottom:.6rem">Who is at the table, in seating order</div><div class="row">' + inputs + '</div>' +
-      '<div class="btns"><button class="btn go" data-act="begin" data-next>Begin →</button><a class="btn ghost" href="print.html?g=leak" target="_blank">Print notebook and exhibits</a></div></div></div>';
+      '<div class="btns"><button class="btn go" data-act="begin" data-next>Begin →</button><a class="btn ghost" href="print.html?g=leak&v=' + V + '" target="_blank">Print notebook and exhibits</a></div></div></div>';
   }
   function vPremise() {
-    return '<div class="stage narrow">' + kick('Northmere Water · Thursday, 10:00') + '<h2>The boardroom</h2>' +
+    return '<div class="stage narrow">' + kick(M.when) + '<h2>' + esc(M.place) + '</h2>' +
       '<div class="sheet" style="margin-top:1.2rem">' + D.PREMISE.map(p => '<p class="lead" style="max-width:none">' + esc(p) + '</p>').join('') + '</div>' + nextBtn('The rules') + '</div>';
   }
   function vRules() {
     return '<div class="stage narrow">' + kick('How it works') + '<h2>Five rules</h2><div class="sheet" style="margin-top:1.2rem">' + list(D.RULES) + '</div>' + nextBtn('Hand out the briefs') + '</div>';
   }
   function vBriefs() {
-    const seats = names().map((nm, i) => '<div class="seat"><h3>' + esc(nm) + '</h3><div class="qr">' + K.qrSvg(K.seatUrl('leak', S.room, i, S.n)) + '</div></div>').join('');
+    const seats = names().map((nm, i) => '<div class="seat"><h3>' + esc(nm) + '</h3><div class="qr">' + K.qrSvg(K.seatUrl('leak', S.room, i, S.n)) + '</div>' + (V === 'rehearsal' ? '<a class="lab" target="_blank" href="' + esc(K.seatUrl('leak', S.room, i, S.n)) + '">Open in a new tab</a>' : '') + '</div>').join('');
     return '<div class="stage">' + kick('Private briefs') + '<h2>Scan your own code. Read in silence.</h2>' +
       '<p class="lead" style="margin:.8rem 0 1.2rem">Five minutes. Keep the phone to yourself; you may look at it again whenever you like.</p><div class="seats">' + seats + '</div>' +
       timerBox() + nextBtn('Statements') + '</div>';
@@ -52,12 +53,12 @@
   function vStatements() {
     const away = S.n < 4 && S.i === 0;
     if (away) {
-      return '<div class="stage narrow">' + kick('One chair is empty') + '<h2>Sam Okafor is not here.</h2>' +
-        '<div class="doc" style="margin-top:1.2rem"><h4><span>Left with Human Resources</span><em>Wednesday</em></h4>' + D.SAM_STATEMENT.map(p => '<p>' + esc(p) + '</p>').join('') + '</div>' + nextBtn('First statement') + '</div>';
+      return '<div class="stage narrow">' + kick('One chair is empty') + '<h2>' + esc(M.awayTitle) + '</h2>' +
+        '<div class="doc" style="margin-top:1.2rem"><h4><span>' + esc(M.awayTag[0]) + '</span><em>' + esc(M.awayTag[1]) + '</em></h4>' + D.AWAY.map(p => '<p>' + esc(p) + '</p>').join('') + '</div>' + nextBtn('First statement') + '</div>';
     }
     const k = S.n < 4 ? S.i - 1 : S.i, c = D.CAST[cast()[k]];
     return '<div class="stage narrow">' + kick('Statement ' + (k + 1) + ' of ' + S.n, names()[k]) + '<h2>' + esc(c.name) + '</h2><div class="lab" style="margin-top:.3rem">' + esc(c.job) + '</div>' +
-      '<div class="sheet" style="margin-top:1.2rem">' + list(['Who are you, and what was your part in this?', 'Where were you on Tuesday between six and ten in the evening?', 'Which version of the note did you have, and how many pages was it?']) + '</div>' +
+      '<div class="sheet" style="margin-top:1.2rem">' + list(M.prompts) + '</div>' +
       '<p class="dim" style="margin-top:.8rem">Two minutes to speak, then questions from the others.</p>' + timerBox() + nextBtn(k < S.n - 1 ? 'Next statement' : 'The paper trail') + '</div>';
   }
   function released() { return D.EXHIBITS.filter(x => x.round <= S.i + 1); }
@@ -76,7 +77,7 @@
       return '<div class="stage narrow">' + kick('The accusation') + '<h2>On paper: one name, one sentence of proof.</h2>' +
         '<p class="lead" style="margin-top:.8rem">Everybody writes, including whoever did it. No talking. Turn them over together at the bell.</p>' + timerBox() + nextBtn('Record the names') + '</div>';
     }
-    const all = ['robin', 'alex', 'sam', 'jo'];
+    const all = M.all;
     const rows = names().map((nm, i) => '<tr><td><b>' + esc(nm) + '</b> names</td><td><div class="chips">' +
       all.map(c => '<button class="chip ' + (S.acc[i] === c ? 'hot' : '') + '" data-act="acc" data-id="' + i + ':' + c + '">' + esc(D.CAST[c].name) + '</button>').join('') + '</div></td></tr>').join('');
     const done = names().every((_, i) => S.acc[i]);
@@ -84,8 +85,8 @@
       '<div class="btns"><button class="btn go" data-act="next" data-next ' + (done ? '' : 'disabled') + '>The truth →</button></div></div>';
   }
   function vSolution() {
-    const who = names()[cast().indexOf('alex')];
-    return '<div class="stage narrow">' + kick('The truth', who) + '<h2>It was Alex Mercer.</h2><div class="sheet" style="margin-top:1.2rem">' + list(D.SOLUTION) + '</div>' +
+    const who = names()[cast().indexOf(M.leaker)];
+    return '<div class="stage narrow">' + kick('The truth', who) + '<h2>' + esc(M.truth) + '</h2><div class="sheet" style="margin-top:1.2rem">' + list(D.SOLUTION) + '</div>' +
       '<p class="lead" style="margin-top:1.2rem">' + esc(who) + ': tell them why. The truth, this time.</p>' + nextBtn('The hearing') + '</div>';
   }
   function vHearing() {
@@ -103,33 +104,32 @@
     const q = D.QUESTIONS[S.i];
     return '<div class="stage narrow">' + kick('Vote ' + (S.i + 1) + ' of 3 · show of hands') + '<h2>' + esc(q.q) + '</h2>' +
       '<div class="opts">' + q.options.map((o, k) => '<button class="opt" data-act="vote" data-id="' + o.id + '"><span class="k">' + 'ABCD'[k] + '</span><b>' + esc(o.label) + '</b></button>').join('') + '</div>' +
-      '<p class="dim" style="margin-top:1rem">A tie goes to the harsher answer: that is what the Board would do.</p></div>';
+      '<p class="dim" style="margin-top:1rem">' + esc(M.tie) + '</p></div>';
   }
   function vEpilogue() {
     const E = D.EPILOGUE, lines = [E.open, E.q2[S.votes.q2], E.q3[S.votes.q3], E.close];
-    return '<div class="stage narrow">' + kick('Afterwards') + '<h2>' + (S.votes.q1 === 'yes' ? 'The room found the leak justified.' : 'The room found the leak unjustified.') + '</h2>' +
-      '<div class="sheet" style="margin-top:1.2rem"><ul class="plain">' + lines.map(l => '<li class="lead" style="max-width:none">' + esc(l) + '</li>').join('') + '</ul></div>' + nextBtn('The scores') + '</div>';
+    return '<div class="stage narrow">' + kick('Afterwards') + '<h2>' + esc(S.votes.q1 === 'yes' ? M.verdict.yes : M.verdict.no) + '</h2>' +
+      '<div class="sheet" style="margin-top:1.2rem"><ul class="plain">' + lines.map(l => '<li class="lead" style="max-width:none">' + esc(l) + '</li>').join('') + '</ul></div>' +
+      (M.real ? '<div class="note"><span class="lab">This happened</span>' + esc(M.real) + '</div>' : '') + nextBtn('The scores') + '</div>';
   }
   function scores() {
     const cs = cast();
-    const others = cs.filter(c => c !== 'alex').length;
-    const namedAlex = names().filter((_, i) => cs[i] !== 'alex' && S.acc[i] === 'alex').length;
-    const robinNamed = names().some((_, i) => S.acc[i] === 'robin');
+    const others = cs.filter(c => c !== M.leaker).length;
+    const namedRight = names().filter((_, i) => cs[i] !== M.leaker && S.acc[i] === M.leaker).length;
+    const clearNamed = names().some((_, i) => S.acc[i] === M.clear);
     return names().map((nm, i) => {
       const c = cs[i]; const parts = [];
-      if (c === 'alex') { if (namedAlex < others / 2) parts.push(['Got away with it', 3]); }
-      else if (S.acc[i] === 'alex') parts.push(['Named the leaker', 2]);
-      if (c === 'robin' && !robinNamed) parts.push(['Nobody suspected you', 1]);
-      if (c === 'jo' && !S.out.grange) parts.push(['The Grange stayed quiet', 1]);
-      if (c === 'sam' && !S.out.monday) parts.push(['Monday stayed quiet', 1]);
+      if (c === M.leaker) { if (namedRight < others / 2) parts.push(['Got away with it', 3]); }
+      else if (S.acc[i] === M.leaker) parts.push(['Named the leaker', 2]);
+      if (c === M.clear && !clearNamed) parts.push(['Nobody suspected you', 1]);
+      M.secrets.forEach(x => { if (c === x.who && !S.out[x.id]) parts.push([x.kept, 1]); });
       if (D.AIMS[c](S.votes)) parts.push(['The hearing went your way', 2]);
       return { nm, c, parts, total: parts.reduce((a, p) => a + p[1], 0) };
     });
   }
   function vScores() {
     const rows = scores(), best = Math.max.apply(null, rows.map(r => r.total)), cs = cast();
-    const toggles = (cs.indexOf('jo') >= 0 ? '<button class="chip ' + (S.out.grange ? 'hot' : '') + '" data-act="out" data-id="grange">Jo’s dinner at the Grange came out</button>' : '') +
-      (cs.indexOf('sam') >= 0 ? '<button class="chip ' + (S.out.monday ? 'hot' : '') + '" data-act="out" data-id="monday">Sam’s offer to the reporter came out</button>' : '');
+    const toggles = M.secrets.filter(x => cs.indexOf(x.who) >= 0).map(x => '<button class="chip ' + (S.out[x.id] ? 'hot' : '') + '" data-act="out" data-id="' + x.id + '">' + esc(x.chip) + '</button>').join('');
     return '<div class="stage narrow">' + kick('The record') + '<h2>Who did well out of it</h2><div class="chips" style="margin:1rem 0">' + toggles + '</div>' +
       '<div class="sheet"><table class="score">' + rows.map(r => '<tr class="' + (r.total === best ? 'top' : '') + '"><td><b>' + esc(r.nm) + '</b><br><span class="lab">' + esc(D.CAST[r.c].name) + '</span></td><td>' +
         (r.parts.length ? r.parts.map(p => esc(p[0]) + ' +' + p[1]).join('<br>') : '<span class="dim">Nothing</span>') + '</td><td class="n">' + r.total + '</td></tr>').join('') + '</table></div>' + nextBtn('Last ten minutes') + '</div>';
@@ -216,5 +216,7 @@
   $('#new').addEventListener('click', () => { if (S.sure) { clock.stop(); S = fresh(); } else S.sure = true; save(); render(); });
   $('#full').addEventListener('click', K.fullscreen);
 
+  $('#tag').textContent = V === 'class' ? 'Class' : 'Rehearsal';
+  $('#tag').className = 'tag ' + V;
   K.keepAwake(); K.sessionClock(() => S.started, 90); render();
 })();

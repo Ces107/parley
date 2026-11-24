@@ -45,6 +45,8 @@ a { color: inherit; }
 .bar .brand b { font-family: var(--display); font-size: 1rem; letter-spacing: .04em; }
 .bar .where { font-family: var(--mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--yellow); }
 .bar .sp { flex: 1; }
+.bar .tag { font-family: var(--mono); font-weight: 600; font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; padding: .12rem .5rem; border: 1px solid var(--yellow); color: var(--yellow); }
+.bar .tag.class { background: var(--red); border-color: var(--red); color: var(--paper); }
 .bar .clock { font-family: var(--mono); font-size: .95rem; }
 .bar .clock i { font-style: normal; opacity: .55; }
 .bar button { background: none; border: 1px solid #ffffff44; color: var(--paper); font: inherit; font-family: var(--mono); font-size: .75rem; padding: .25rem .6rem; cursor: pointer; }
@@ -187,12 +189,14 @@ details { margin-top: 1rem; } summary { cursor: pointer; font-family: var(--mono
 .hub h1 { font-size: clamp(3rem, 9vw, 7rem); letter-spacing: -.03em; }
 .hub .sub { font-family: var(--mono); letter-spacing: .14em; text-transform: uppercase; font-size: .85rem; margin: .6rem 0 3rem; color: var(--ink-2); }
 .games { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 2.2rem 1.8rem; }
-.game { text-decoration: none; display: grid; grid-template-columns: 1fr; gap: 1.2rem; align-items: start; justify-items: start; }
+.game { text-decoration: none; display: grid; grid-template-columns: 1fr; gap: 1.2rem; align-items: start; align-content: start; justify-items: start; }
 .game h2 { font-size: 1.45rem; margin-bottom: .3rem; }
 .game p { font-size: .98rem; color: var(--ink-2); margin: 0 0 .5rem; }
 .game .meta { font-family: var(--mono); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink); display: flex; gap: .5rem; flex-wrap: wrap; }
 .game .meta span { border: 1px solid var(--ink); padding: .1rem .4rem; }
-.game:hover .tile { transform: translate(-2px, -2px); }
+.game .pick { display: flex; gap: .8rem; margin-top: 1rem; }
+.legend { margin-top: 2.6rem; font-size: .95rem; color: var(--ink-2); max-width: 44rem; }
+.seat a.lab { display: inline-block; margin-top: .5rem; color: var(--red); }
 .byline { margin-top: 4rem; font-family: var(--mono); font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); display: flex; gap: 1.2rem; flex-wrap: wrap; align-items: center; }
 
 /* ---------- phone ---------- */

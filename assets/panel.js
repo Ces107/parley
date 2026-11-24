@@ -2,7 +2,8 @@
 (function () {
   'use strict';
   const D = window.PANEL, K = window.K, $ = K.$, esc = K.esc;
-  const LS = K.store('parley.panel.v1');
+  const V = K.variant();
+  const LS = K.store('parley.panel.v2.' + V);
   const app = $('#app');
   const T = { minute: 60, write: 120, prep: 120, grill: 150, lectprep: 180, lecture: 90, review: 300 };
   let S = LS.get(), net = null, plan = null, linking = false;
@@ -44,7 +45,7 @@
       '<div class="btns"><button class="btn go" data-act="begin" data-next>Begin →</button></div></div></div>';
   }
   function vJoin() {
-    const seats = names().map((n, i) => '<div class="seat ' + (S.seen[i] ? 'on' : '') + '"><h3>' + esc(n) + (S.seen[i] ? ' ✓' : '') + '</h3><div class="qr">' + K.qrSvg(K.seatUrl('panel', S.room, i, S.n, { b: S.b >= 0 ? S.b : null }, names())) + '</div><div class="lab" style="margin-top:.4rem">Key ' + (i + 1) + '</div></div>').join('');
+    const seats = names().map((n, i) => '<div class="seat ' + (S.seen[i] ? 'on' : '') + '"><h3>' + esc(n) + (S.seen[i] ? ' ✓' : '') + '</h3><div class="qr">' + K.qrSvg(K.seatUrl('panel', S.room, i, S.n, { b: S.b >= 0 ? S.b : null }, names())) + '</div><div class="lab" style="margin-top:.4rem">Key ' + (i + 1) + '</div>' + (V === 'rehearsal' ? '<a class="lab" target="_blank" href="' + esc(K.seatUrl('panel', S.room, i, S.n, { b: S.b >= 0 ? S.b : null }, names())) + '">Open in a new tab</a>' : '') + '</div>').join('');
     if (linking) return '<div class="stage">' + kick('Buzzers') + '<h2>Connecting…</h2></div>';
     const link = S.b >= 0 ? '<p class="lead" style="margin:.8rem 0 1.2rem">Scan your own code and press the red button once.</p>'
       : '<div class="note" style="border-color:var(--red)"><span class="lab">No live link</span>Phones will still show your private cards. For buzzing, use keys 1 to ' + S.n + ' on this keyboard.</div><div class="gap"></div>';
@@ -146,7 +147,7 @@
 
   const WHERE = { setup: '', join: 'Buzzers', 'jam-intro': 'Round 1', jam: 'Round 1 · One Minute', 'bluff-intro': 'Round 2', bluff: 'Round 2 · The Dictionary', 'wilty-intro': 'Round 3', 'wilty-prep': 'Round 3 · True or Not', wilty: 'Round 3 · True or Not', 'truth-intro': 'Round 4', 'truth-prep': 'Round 4 · The Lecture', truth: 'Round 4 · The Lecture', final: 'Scores', close: 'Closing', done: '' };
   function render() {
-    if (S.n && !plan) plan = D.plan(S.room, S.n);
+    if (S.n && !plan) plan = D.plan(S.room, S.n, V);
     const p = S.phase;
     const html = p === 'setup' ? vSetup() : p === 'join' ? vJoin() : p === 'jam-intro' ? vIntro('jam', 1) : p === 'jam' ? vJam() : p === 'bluff-intro' ? vIntro('bluff', 2) : p === 'bluff' ? vBluff()
       : p === 'wilty-intro' ? vIntro('wilty', 3) : p === 'wilty-prep' ? vPrep('wilty') : p === 'wilty' ? vWilty() : p === 'truth-intro' ? vIntro('truth', 4) : p === 'truth-prep' ? vPrep('truth') : p === 'truth' ? vTruth()
@@ -202,7 +203,7 @@
     begin() {
       const l = S.names.map(s => s.trim()).filter(Boolean);
       if (l.length < 3) { K.beep('no'); return; }
-      S.names = l.concat(['', '', '', '']).slice(0, 4); S.n = l.length; S.started = Date.now(); S.phase = 'join'; plan = D.plan(S.room, S.n);
+      S.names = l.concat(['', '', '', '']).slice(0, 4); S.n = l.length; S.started = Date.now(); S.phase = 'join'; plan = D.plan(S.room, S.n, V);
       connect(null).then(() => render());
     },
     next() {
@@ -273,7 +274,9 @@
   $('#new').addEventListener('click', () => { if (S.sure) acts.reset(); else S.sure = true; save(); render(); });
   $('#full').addEventListener('click', K.fullscreen);
 
+  $('#tag').textContent = V === 'class' ? 'Class' : 'Rehearsal';
+  $('#tag').className = 'tag ' + V;
   K.keepAwake(); K.sessionClock(() => S.started, 90);
-  if (S.phase !== 'setup') { plan = D.plan(S.room, S.n); connect(S.b >= 0 ? S.b : null).then(() => render()); }
+  if (S.phase !== 'setup') { plan = D.plan(S.room, S.n, V); connect(S.b >= 0 ? S.b : null).then(() => render()); }
   render();
 })();

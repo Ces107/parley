@@ -138,21 +138,23 @@
 
   const K = () => root.K;
   // The whole evening is derived from the room code, so the screen and every phone agree without talking.
-  function plan(room, n) {
-    const r = K().rng(room + ':panel');
+  function plan(room, n, v) {
+    const half = list => list.filter((_, i) => (i % 2 === 0) === (v !== 'class'));
+    const SUBJECTS_ = half(SUBJECTS), WORDS_ = half(WORDS), LIES_ = half(LIES), LECTURES_ = half(LECTURES);
+    const r = K().rng(room + ':panel:' + (v === 'class' ? 'class' : 'rehearsal'));
     const seats = Array.from({ length: n }, (_, i) => i);
     const jamTurns = n * 2;
-    const subjects = K().sample(SUBJECTS, jamTurns, r);
+    const subjects = K().sample(SUBJECTS_, jamTurns, r);
     const jam = subjects.map((s, i) => ({ subject: s, starter: i % n }));
-    const words = K().sample(WORDS, 4, r);
+    const words = K().sample(WORDS_, 4, r);
     const bluff = words.map((w, i) => ({ word: w, reader: i % n }));
     const wTurns = n === 3 ? 4 : n;
-    const lies = K().sample(LIES, wTurns, r);
+    const lies = K().sample(LIES_, wTurns, r);
     let kinds = [];
     do { kinds = Array.from({ length: wTurns }, () => r() < 0.5); } while (kinds.every(Boolean) || !kinds.some(Boolean));
     const order = K().shuffle(seats, r);
     const wilty = lies.map((l, i) => ({ speaker: order[i % n], truth: kinds[i], lie: l }));
-    const lect = K().sample(LECTURES, n, r);
+    const lect = K().sample(LECTURES_, n, r);
     const tOrder = K().shuffle(seats, r);
     const truth = lect.map((l, i) => ({ lecturer: tOrder[i], subject: l.subject, truths: l.truths }));
     return { jam, bluff, wilty, truth };

@@ -17,7 +17,7 @@
   function council() {
     const C = window.COUNCIL, id = C.portfoliosFor(room, n)[seat], p = C.PORTFOLIOS[id];
     if (!p) return '<p>Unknown seat.</p>';
-    return cover('Your ministry', '<div class="lab">The Republic of Skerry</div><h1>' + esc(p.title) + '</h1>' +
+    return cover('Your ministry', '<div class="lab">' + esc(C.META.title) + '</div><h1>' + esc(p.title) + '</h1>' +
       '<p style="margin-top:.8rem">' + esc(p.brief[0]) + '</p><div class="secret">' + esc(p.brief[1]) + '</div><div class="want">' + esc(p.brief[2]) + '</div>' +
       '<p class="dim">Argue as a minister. Nobody needs to know what you owe, or to whom.</p>');
   }
@@ -26,7 +26,7 @@
   function leak() {
     const L = window.LEAK, id = L.castFor(room, n)[seat], c = L.CAST[id];
     if (!c) return '<p>Unknown seat.</p>';
-    return cover('Your brief', '<div class="lab">Northmere Water</div><h1>' + esc(c.name) + '</h1><div class="lab" style="margin:.2rem 0 .8rem">' + esc(c.job) + '</div>' +
+    return cover('Your brief', '<div class="lab">' + esc(L.META.label) + '</div><h1>' + esc(c.name) + '</h1><div class="lab" style="margin:.2rem 0 .8rem">' + esc(c.job) + '</div>' +
       '<p>' + esc(c.who) + '</p><h2>' + (c.liar ? 'What you did' : 'What you know') + '</h2>' + ul(c.know) +
       '<h2>' + (c.liar ? 'Why' : 'What you would rather keep quiet') + '</h2><div class="secret">' + c.quiet.map(q => '<p style="margin:0 0 .5em">' + esc(q) + '</p>').join('') + '</div>' +
       '<div class="want"><b>' + esc(c.want) + '</b></div>' +
@@ -82,7 +82,7 @@
     return '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1rem"><b>' + esc(name) + '</b><span class="net ' + (live ? 'ok' : 'bad') + '">' + (live ? 'Live' : 'Offline') + '</span></div>' + body + myCards();
   }
   function startPanel() {
-    plan = window.PANEL.plan(room, n);
+    plan = window.PANEL.plan(room, n, K.variant());
     const s = document.createElement('script');
     s.src = 'assets/vendor/mqtt/mqtt.min.js';
     s.onload = () => {

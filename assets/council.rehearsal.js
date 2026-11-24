@@ -2,6 +2,18 @@
 (function (root) {
   'use strict';
 
+  const META = {
+    title: 'The Republic of Skerry',
+    lead: 'A new country, one year, nine decisions. Bring pencils, paper and two coins each.',
+    bill: 'The teachers, the nurses and the ferry crew have been paid.',
+    verdicts: {
+      fell: 'The government fell before the year was out.',
+      dead: 'The Republic did not see its first anniversary.',
+      just: 'The Republic of Skerry enters its second year. Just.',
+      ok: 'The Republic of Skerry enters its second year.'
+    }
+  };
+
   const GAUGES = [
     { id: 'treasury', name: 'Treasury' },
     { id: 'trust', name: 'Trust' },
@@ -244,6 +256,7 @@
 
   // Before these dispatches (counting from zero) the quarter's wages fall due: Treasury -1.
   const BILLS = [1, 3, 5, 7];
+  const FIRST = 'windfall';
   const PROMISE_CRISES = ['passports', 'gathering', 'reserve', 'union'];
   const POOL = ['cable', 'dateline', 'school', 'mine', 'recognition', 'camp', 'coin'];
 
@@ -265,7 +278,7 @@
       options: [
         { id: 'a', label: 'Hold the referendum, and campaign to stay', pitch: 'Ask them. If we lose, we deserved to.', fx: { trust: 3, treasury: -1 },
           out: 'On a turnout of 91 per cent, Skerry votes to remain a country, by 212 votes. The Council has been told, exactly, how much it is trusted.' },
-        { id: 'b', label: 'Refuse: the Charter stands', pitch: 'Governments are not dismissed by petition.', fx: { trust: -2, standing: -1 },
+        { id: 'b', label: 'Refuse: the Charter stands', pitch: 'Governments are not dismissed by petition.', fx: { trust: -1, treasury: 1 },
           out: 'The petition is filed in the archive. On Independence Day the square is half empty, and the half that came has brought whistles.' }
       ],
       real: 'Anguilla rebelled against being governed from St Kitts in 1967, expelled the police, and voted by 1,813 to 5 to leave. It later became a British territory again by its own choice.'
@@ -326,8 +339,8 @@
   function orderFor(room) {
     const r = root.K.rng(room + ':order');
     const mid = root.K.shuffle(PROMISE_CRISES.concat(root.K.sample(POOL, 3, r)), r);
-    return ['windfall'].concat(mid);
+    return [FIRST].concat(mid);
   }
 
-  root.COUNCIL = { GAUGES, RULES, CHARTER, PORTFOLIOS, CRISES, RECKONING, EPILOGUE, CLOSERS, PROMISE_CRISES, POOL, BILLS, portfoliosFor, orderFor };
+  root.COUNCIL = { META, FIRST, GAUGES, RULES, CHARTER, PORTFOLIOS, CRISES, RECKONING, EPILOGUE, CLOSERS, PROMISE_CRISES, POOL, BILLS, portfoliosFor, orderFor };
 })(typeof window !== 'undefined' ? window : globalThis);

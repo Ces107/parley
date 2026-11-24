@@ -2,6 +2,29 @@
 (function (root) {
   'use strict';
 
+  const META = {
+    when: 'Northmere Water · Thursday, 10:00',
+    place: 'The boardroom',
+    label: 'Northmere Water',
+    lead: 'A confidential note reached a newspaper. One of you sent it. Bring pencils; print the case notebook and the exhibits if you can.',
+    all: ['robin', 'alex', 'sam', 'jo'],
+    leaker: 'alex',
+    absent: 'sam',
+    awayTitle: 'Sam Okafor is not here.',
+    awayTag: ['Left with Human Resources', 'Wednesday'],
+    prompts: ['Who are you, and what was your part in this?', 'Where were you on Tuesday between six and ten in the evening?', 'Which version of the note did you have, and how many pages was it?'],
+    truth: 'It was Alex Mercer.',
+    clear: 'robin',
+    secrets: [
+      { who: 'jo', id: 'grange', chip: 'Jo’s dinner at the Grange came out', kept: 'The Grange stayed quiet' },
+      { who: 'sam', id: 'monday', chip: 'Sam’s offer to the reporter came out', kept: 'Monday stayed quiet' }
+    ],
+    verdict: { yes: 'The room found the leak justified.', no: 'The room found the leak unjustified.' },
+    tie: 'A tie goes to the harsher answer: that is what the Board would do.',
+    grid: ['Which version, how many pages?', 'Where on Tuesday evening?', 'Hiding something?'],
+    real: ''
+  };
+
   const PREMISE = [
     'Northmere Water supplies two million people. Last Friday the result of a routine sample from the Ashby works, which serves 61,000 of them, came back showing PFAS, the so-called forever chemicals, at 0.14 micrograms per litre. The legal limit is 0.10.',
     'On Tuesday morning the Chief Executive decided to tell the Water Inspectorate only after its ruling on Northmere’s prices, ten days away.',
@@ -11,7 +34,7 @@
 
   const RULES = [
     'You each have a private brief: who you are, what you know, what you would rather keep quiet.',
-    'All but one of you never say anything false. You may decline to answer a question once; asked again, you tell the truth.',
+    'All of you but one tell only the truth. You may decline to answer a question once; asked again, you answer it.',
     'One of you sent the note. That person may lie.',
     'No accents, no acting: a name and a motive are enough.',
     'Use the notebook sheet. Dates, times and page numbers matter.'
@@ -234,9 +257,9 @@
   ];
 
   function castFor(room, n) {
-    const list = n >= 4 ? ['robin', 'alex', 'sam', 'jo'] : ['robin', 'alex', 'jo'];
+    const list = n >= 4 ? META.all : META.all.filter(c => c !== META.absent);
     return root.K.shuffle(list, root.K.rng(room + ':cast'));
   }
 
-  root.LEAK = { PREMISE, RULES, CAST, SAM_STATEMENT, EXHIBITS, ROUNDS, SOLUTION, HEARING_INTRO, CARDS, QUESTIONS, AIMS, EPILOGUE, CLOSERS, castFor };
+  root.LEAK = { META, PREMISE, RULES, CAST, AWAY: SAM_STATEMENT, EXHIBITS, ROUNDS, SOLUTION, HEARING_INTRO, CARDS, QUESTIONS, AIMS, EPILOGUE, CLOSERS, castFor };
 })(typeof window !== 'undefined' ? window : globalThis);
