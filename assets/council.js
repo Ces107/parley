@@ -134,7 +134,7 @@
     const pf = D.portfoliosFor(S.room, S.n);
     const seats = names().map((nm, i) => '<div class="seat"><h3>' + esc(nm) + '</h3><div class="qr">' + K.qrSvg(seatLink(i)) + '</div>' + (V === 'rehearsal' ? '<a class="lab" target="_blank" href="' + esc(seatLink(i)) + '">Open in a new tab</a>' : '') + '</div>').join('');
     return '<div class="stage"><div class="kicker"><span>The ministries</span></div><h2>Now find out which ministry is yours.</h2>' +
-      '<p class="lead" style="margin:.8rem 0 1.2rem">Scan your own code and read what it says. Do not show it to anybody, and put your phone face down when you have finished.</p>' +
+      '<p class="lead" style="margin:.8rem 0 1.2rem">Scan the QR code under your name and read what it says. Do not show it to anybody, and put your phone face down when you have finished.</p>' +
       '<div class="seats">' + seats + '</div>' +
       '<details><summary>No phone?</summary><p class="dim" style="margin-top:.5rem">Open this link on any device, replacing SEAT with a number from 0 to ' + (pf.length - 1) + ': ' + esc(seatLink(0).replace('s=0', 's=SEAT')) + '</p></details>' +
       nextBtn('First dispatch') + '</div>';
@@ -222,7 +222,7 @@
     return '<div class="stage narrow">' + kicker(writing ? 'On paper · optional' : 'Language') +
       (writing
         ? '<h2>Fifty words, in pencil</h2><div class="sheet" style="margin-top:1.1rem"><ul class="plain">' + D.CLOSERS.map(c => '<li class="lead" style="max-width:none">' + esc(c) + '</li>').join('') + '</ul></div><p class="dim" style="margin-top:.8rem">Choose one. When the time is up, read them out.</p>'
-        : '<h2>The English you heard tonight</h2><div class="sheet" style="margin-top:1.1rem"><ol class="steps big"><li>Each of you names one phrase somebody else used that you would like to use yourself.</li><li>Each of you mentions one mistake you heard and says how to put it right.</li><li>Each of you gives one word you learned tonight.</li></ol></div>') +
+        : '<h2>The English you heard today</h2><div class="sheet" style="margin-top:1.1rem"><ol class="steps big"><li>Each of you names one phrase somebody else used that you would like to use yourself.</li><li>Each of you mentions one mistake you heard and says how to put it right.</li><li>Each of you gives one word you learned today.</li></ol></div>') +
       timerBox() + nextBtn(writing ? 'Language' : 'Finish') + '</div>';
   }
   function vDone() {

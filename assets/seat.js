@@ -21,9 +21,20 @@
     const picks = String(P.c || '').split('.'), f = {};
     C.CHARTER.forEach((a, i) => { if (a.options.some(o => o.id === picks[i])) f[a.id] = picks[i]; });
     const crisis = C.CRISES[p.promise.crisis], guard = Object.keys(f).length === C.CHARTER.length && crisis.guard ? crisis.guard(f) : null;
+    let charter = '';
+    if (guard) {
+      const A = id => 'option ' + id.toUpperCase(), mine = p.promise.keeps, bound = id => guard.options.indexOf(id) >= 0;
+      const every = id => bound(id) || !!crisis.options.find(o => o.id === id).unanimous;
+      const stopped = mine.filter(bound), easy = mine.filter(id => !every(id));
+      const others = crisis.options.map(o => o.id).filter(id => mine.indexOf(id) < 0);
+      charter = stopped.length && !easy.length ? 'It stands in the way of your promise. What you need can now only win if every minister votes for it.'
+        : stopped.length ? 'It stands in the way of ' + stopped.map(A).join(' and ') + ', which can now only win if every minister votes for it. ' + easy.map(A).join(' and ').replace(/^o/, 'O') + ' still needs only a majority.'
+        : others.length && others.every(bound) ? 'It is on your side. The other side can now only win if every minister votes for it.'
+        : 'It leaves this decision to a majority.';
+    }
     return cover('Your ministry', '<div class="lab">' + esc(C.META.title) + '</div><h1>' + esc(p.title) + '</h1>' +
       '<p style="margin-top:.8rem">' + esc(p.brief[0]) + '</p><div class="secret">' + esc(p.brief[1]) + '</div>' +
-      (guard ? '<div class="sheet" style="margin:.8rem 0"><div class="lab" style="margin-bottom:.3rem">The Charter you signed</div>' + esc(guard.why) + '</div>' : '') +
+      (charter ? '<div class="sheet" style="margin:.8rem 0"><div class="lab" style="margin-bottom:.3rem">The Charter you signed</div>' + esc(charter) + '</div>' : '') +
       '<div class="want">' + esc(p.brief[2]) + '</div>' +
       '<p class="dim">Keep all of this to yourself until the scores are shown.</p>');
   }
