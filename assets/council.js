@@ -87,29 +87,29 @@
       '<div class="btns"><button class="btn go" data-act="begin" data-next>Begin →</button><a class="btn ghost" href="print.html?g=council&v=' + V + '" target="_blank">Print the minister’s sheet</a></div></div></div>';
   }
   function gaugeCard(g) {
-    return '<div class="gcard"><div class="gauge"><div class="top"><span class="lab">' + esc(g.name) + '</span><span class="v">5</span></div><div class="segs">' + segs(5) + '</div></div>' +
-      '<p>' + esc(g.what) + '</p><dl><dt>At 10</dt><dd>' + esc(g.high) + '</dd><dt>At 0</dt><dd>' + esc(g.zero) + '</dd></dl></div>';
+    return '<div class="gcard"><div class="gauge"><div class="top"><span class="lab">' + esc(g.name) + '</span><span class="v">5</span></div><div class="segs">' + segs(5) + '</div></div><p>' + esc(g.what) + '</p></div>';
   }
   function vRules() {
     const I = D.INTRO;
     if (S.i === 0) {
-      return '<div class="stage">' + kicker(I.place, 'Reads aloud') + '<h2>' + esc(I.headline) + '</h2>' +
-        '<div class="split"><div>' + I.story.map(p => '<p class="lead">' + esc(p) + '</p>').join('') + nextBtn('The four gauges') + '</div>' +
+      return '<div class="stage">' + kicker('The country', 'Reads aloud') + '<h2>' + esc(D.META.title) + '</h2>' +
+        '<div class="split"><div>' + I.story.map(p => '<p class="lead">' + esc(p) + '</p>').join('') + nextBtn('What you do') + '</div>' +
         '<div class="doc"><h4>' + esc(I.sheet) + '</h4><table>' + I.facts.map(f => '<tr><th>' + esc(f[0]) + '</th><td>' + esc(f[1]) + '</td></tr>').join('') + '</table></div></div></div>';
     }
     if (S.i === 1) {
-      return '<div class="stage">' + kicker('The gauges', 'Reads aloud') + '<h2>Four gauges show how the country is doing.</h2>' +
+      return '<div class="stage">' + kicker('The game', 'Reads aloud') + '<h2>What you do</h2>' +
+        '<p class="lead" style="margin-top:.9rem;max-width:none">' + esc(I.game) + '</p>' +
         '<div class="gcards">' + D.GAUGES.map(gaugeCard).join('') + '</div>' +
-        '<p class="lead" style="margin-top:1.2rem">Each one runs from 0 to 10 and starts at 5. Almost every decision you take will push some of them up and others down.</p>' +
-        nextBtn('How the Council decides') + '</div>';
+        '<p class="lead" style="margin-top:1.2rem;max-width:none">Each gauge goes from 0 to 10 and starts at 5. Most decisions push one gauge up and another down.</p>' +
+        nextBtn('A dispatch, step by step') + '</div>';
     }
     if (S.i === 2) {
-      return '<div class="stage narrow">' + kicker('The Council', 'Reads aloud') + '<h2>How the Council decides</h2>' +
-        '<div class="sheet" style="margin-top:1.2rem"><ol class="steps big">' + D.RULES.map(r => '<li>' + esc(r) + '</li>').join('') + '</ol></div>' + nextBtn('The Charter') + '</div>';
+      return '<div class="stage narrow">' + kicker('The game', 'Reads aloud') + '<h2>A dispatch, step by step</h2>' +
+        '<div class="sheet" style="margin-top:1.2rem"><ol class="steps roomy">' + D.RULES.map(r => '<li>' + esc(r) + '</li>').join('') + '</ol></div>' + nextBtn('The Charter') + '</div>';
     }
-    return '<div class="stage narrow">' + kicker('Act I', 'Reads aloud') + '<h2>The Charter comes first.</h2>' +
-      '<p class="lead" style="margin-top:1rem">' + esc(I.charter.lead) + '</p>' +
-      '<div class="sheet" style="margin-top:1.2rem"><ul class="plain">' + I.charter.points.map(p => '<li class="lead" style="max-width:none">' + esc(p) + '</li>').join('') + '</ul></div>' +
+    return '<div class="stage narrow">' + kicker('The game', 'Reads aloud') + '<h2>The Charter, and how you score</h2>' +
+      '<p class="lead" style="margin-top:1rem;max-width:none">' + esc(I.charter.lead) + '</p>' +
+      '<div class="sheet" style="margin-top:1.1rem"><ul class="plain roomy">' + I.charter.points.map(p => '<li>' + esc(p) + '</li>').join('') + '</ul></div>' +
       nextBtn('Article 1') + '</div>';
   }
   function vCharter() {
@@ -127,7 +127,7 @@
   function vSigned() {
     return '<div class="stage narrow">' + kicker('Act I · The Charter', 'Reads aloud') + '<h2>The Charter is signed.</h2>' +
       '<div style="margin-top:1.2rem">' + charterDoc() + '</div>' +
-      '<p class="lead" style="margin-top:1.2rem">From now on it binds you. The Council can only go against an article if every minister agrees.</p>' +
+      '<p class="lead" style="margin-top:1.2rem">The Charter is now in force. To go against one of its articles, all of you have to vote for it.</p>' +
       nextBtn('Hand out the ministries') + '</div>';
   }
   function vLots() {
@@ -222,7 +222,7 @@
     return '<div class="stage narrow">' + kicker(writing ? 'On paper · optional' : 'Language') +
       (writing
         ? '<h2>Fifty words, in pencil</h2><div class="sheet" style="margin-top:1.1rem"><ul class="plain">' + D.CLOSERS.map(c => '<li class="lead" style="max-width:none">' + esc(c) + '</li>').join('') + '</ul></div><p class="dim" style="margin-top:.8rem">Choose one. When the time is up, read them out.</p>'
-        : '<h2>The English you heard today</h2><div class="sheet" style="margin-top:1.1rem"><ol class="steps big"><li>Each of you names one phrase somebody else used that you would like to use yourself.</li><li>Each of you mentions one mistake you heard and says how to put it right.</li><li>Each of you gives one word you learned today.</li></ol></div>') +
+        : '<h2>The English you heard today</h2><div class="sheet" style="margin-top:1.1rem"><ol class="steps roomy"><li>Each of you names one phrase somebody else used that you would like to use yourself.</li><li>Each of you mentions one mistake you heard and says how to put it right.</li><li>Each of you gives one word you learned today.</li></ol></div>') +
       timerBox() + nextBtn(writing ? 'Language' : 'Finish') + '</div>';
   }
   function vDone() {

@@ -28,31 +28,31 @@
     const C = window.COUNCIL, I = C.INTRO;
     const lines = C.CHARTER.map((_, i) => 'Article ' + (i + 1)).concat(Array.from({ length: C.PROMISE_CRISES.length + 4 }, (_, i) => 'Dispatch ' + (i + 1)), ['The reckoning']);
     const cols = C.GAUGES.map(x => '<th style="width:10%">' + esc(x.name) + '</th>').join('');
-    const coin = '<div class="coin"><div><b>Marker</b><span>Spend it and your vote counts twice.</span><span>Keep it and score 1 point.</span></div></div>';
-    const facts = I.facts.map(x => '<tr><th>' + esc(x[0]) + '</th><td>' + esc(x[1]) + '</td></tr>');
-    // Front: the briefing, with the two markers in the top right-hand corner and the country's figures under them.
-    const front = '<section class="page front">' +
+    const coin = '<div class="coin"><div><b>Marker</b><span>Hand it in and your vote counts as two.</span><span>Keep it and score 1 point.</span></div></div>';
+    const tag = '<div class="lab">The Council · ' + which + '</div>';
+    // Page 1: the country, the gauges and how a dispatch works, with the two markers in the top right-hand corner.
+    const one = '<section class="page front">' +
       '<div class="cut"><div class="lab">✂ Cut out your two markers</div><div class="coins">' + coin + coin + '</div></div>' +
-      '<table class="facts">' + facts.join('') + '</table>' +
-      '<div class="lab">The Council · ' + which + '</div>' +
-      '<h2>' + esc(C.META.title) + '</h2><p class="where">' + esc(I.place) + '</p>' +
-      '<p><b>' + esc(I.headline) + '</b> ' + esc(I.story[0]) + '</p>' + I.story.slice(1).map(x => '<p>' + esc(x) + '</p>').join('') +
-      '<h3 style="clear:both">The four gauges</h3><table><tr><th style="width:14%"></th><th>What it measures</th><th style="width:27%">At 10</th><th style="width:24%">At 0</th></tr>' +
-      C.GAUGES.map(x => '<tr><td><b>' + esc(x.name) + '</b></td><td>' + esc(x.what) + '</td><td>' + esc(x.high) + '</td><td>' + esc(x.zero) + '</td></tr>').join('') + '</table>' +
-      '<p style="margin-top:1.5mm">Each one runs from 0 to 10 and starts at 5. Almost every decision you take will push some of them up and others down.</p>' +
-      '<h3>How the Council decides</h3><ol>' + C.RULES.map(r => '<li>' + esc(r) + '</li>').join('') + '</ol>' +
-      '<h3>The Charter comes first</h3><p>' + esc(I.charter.lead) + '</p>' + I.charter.points.map(x => '<p>' + esc(x) + '</p>').join('') +
+      '<table class="facts">' + I.facts.map(x => '<tr><th>' + esc(x[0]) + '</th><td>' + esc(x[1]) + '</td></tr>').join('') + '</table>' +
+      tag + '<h2>' + esc(C.META.title) + '</h2>' + I.story.map(x => '<p>' + esc(x) + '</p>').join('') +
+      '<h3 style="clear:both">What you do</h3><p>' + esc(I.game) + '</p>' +
+      '<table>' + C.GAUGES.map(x => '<tr><th style="width:17%">' + esc(x.name) + '</th><td>' + esc(x.what) + '</td></tr>').join('') + '</table>' +
+      '<p style="margin-top:1.5mm">Each gauge goes from 0 to 10 and starts at 5. Most decisions push one gauge up and another down.</p>' +
+      '<h3>A dispatch, step by step</h3><ol>' + C.RULES.map(r => '<li>' + esc(r) + '</li>').join('') + '</ol>' +
       '</section>';
-    // Back: the record of the year and the language notes. Its top left-hand corner is the back of the markers, so it stays empty.
-    const back = '<section class="page record"><div class="cut back"></div>' +
-      '<div class="lab">The Council · ' + which + ' · print on both sides</div><h2>Minister’s sheet</h2>' + nameLine +
-      '<table style="clear:both"><tr><th style="width:19%"></th><th>What the Council decided</th>' + cols + '</tr>' +
-      '<tr><td>Start</td><td></td>' + C.GAUGES.map(() => '<td>5</td>').join('') + '</tr>' +
-      lines.map(l => '<tr><td style="height:8mm">' + l + '</td><td></td>' + C.GAUGES.map(() => '<td></td>').join('') + '</tr>').join('') + '</table>' +
-      '<h3>Phrases to try. Tick each one when you use it.</h3><p style="columns:3;font-size:8.6pt;margin:0">' + K.PHRASES.slice(0, 18).map(x => '☐ ' + esc(x)).join('<br>') + '</p>' +
+    // Page 2, the back of page 1: its top left-hand corner is the back of the markers, so it stays empty.
+    const two = '<section class="page front"><div class="cut back"></div>' + tag + '<h2>The Charter, and how you score</h2>' +
+      '<p style="clear:both">' + esc(I.charter.lead) + '</p>' + I.charter.points.map(x => '<p>' + esc(x) + '</p>').join('') +
+      '<h3>Ten phrases to try. Tick each one when you use it.</h3><div class="ticks">' + K.PHRASES.map(x => '<span>☐ ' + esc(x) + '</span>').join('') + '</div>' +
       '<div class="three"><div><h3>Phrases to borrow</h3><div class="box"></div></div><div><h3>Corrections</h3><div class="box"></div></div><div><h3>New words</h3><div class="box"></div></div></div>' +
       '</section>';
-    return front + back;
+    // Page 3: the record of the year.
+    const three = '<section class="page record">' + tag + '<h2>Minister’s sheet</h2>' + nameLine +
+      '<table><tr><th style="width:19%"></th><th>What the Council decided</th>' + cols + '</tr>' +
+      '<tr><td>Start</td><td></td>' + C.GAUGES.map(() => '<td>5</td>').join('') + '</tr>' +
+      lines.map(l => '<tr><td style="height:9.5mm">' + l + '</td><td></td>' + C.GAUGES.map(() => '<td></td>').join('') + '</tr>').join('') + '</table>' +
+      '<h3>Fifty words (optional)</h3><div class="box" style="min-height:52mm"></div></section>';
+    return one + two + three;
   }
 
   const html = g === 'leak' ? leak() : g === 'council' ? council() : '<section class="page"><h2>Nothing to print for this game.</h2><p>Scrap paper and pencils are enough.</p></section>';

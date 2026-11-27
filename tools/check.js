@@ -18,10 +18,11 @@ function council(v) {
   ok(C.META && C.META.title && C.META.bill && C.META.verdicts.ok, tag + 'META');
   [0, 1, 2, 9].forEach(n => ok(typeof C.META.charterLine(n) === 'string' && C.META.charterLine(n).length > 20 && !/undefined/.test(C.META.charterLine(n)), tag + 'charter line ' + n));
   const I = C.INTRO;
-  ok(I && I.place && I.headline && I.story.length === 3 && I.sheet && I.facts.length >= 6 && I.facts.every(f => f.length === 2), tag + 'INTRO');
-  ok(I.charter.title && I.charter.date && I.charter.lead && I.charter.points.length === 2, tag + 'INTRO.charter');
-  C.GAUGES.forEach(g => ok(g.name && g.what && g.high && g.zero, tag + 'gauge text ' + g.id));
-  ok(C.RULES.length === 5, tag + 'five rules');
+  ok(I && I.story.length === 3 && I.game && I.sheet && I.facts.length >= 6 && I.facts.every(f => f.length === 2), tag + 'INTRO');
+  ok(I.charter.title && I.charter.date && I.charter.lead && I.charter.points.length === 3, tag + 'INTRO.charter');
+  C.GAUGES.forEach(g => ok(g.name && g.what, tag + 'gauge text ' + g.id));
+  ok(C.RULES.length === 6, tag + 'six rules');
+  ok(K.PHRASES.length === 10 && new Set(K.PHRASES).size === 10, 'ten phrases');
   ok(gids.length === 4 && new Set(gids).size === 4, tag + 'four gauges');
   const pids = Object.keys(C.PORTFOLIOS);
   for (let t = 0; t < 300; t++) {

@@ -6,7 +6,7 @@
 
   const META = {
     title: 'The Republic of Skerry',
-    lead: 'A new country and its first year. Everyone needs a pencil, some paper and two markers. Cut the markers from the printed sheet, or use coins.',
+    lead: 'You govern a new country for its first year. Each player needs a pencil, some paper and two markers. Cut the markers from the printed sheet, or use two coins.',
     bill: 'The teachers, the nurses and the ferry crew have been paid.',
     verdicts: {
       fell: 'The government fell before the year was out.',
@@ -18,19 +18,17 @@
   };
 
   const GAUGES = [
-    { id: 'treasury', name: 'Treasury', what: 'The money the state has to spend.', high: 'The nurses are paid on time and there is money for the sea wall.', zero: 'Nobody who works for the state is paid.' },
-    { id: 'trust', name: 'Trust', what: 'How far Skerrans believe in their own government.', high: 'People will put up with a hard decision.', zero: 'People stop doing what the Council says.' },
-    { id: 'reef', name: 'Reef', what: 'The state of the island’s sea and land. Almost everybody here makes a living from them.', high: 'The boats come home full.', zero: 'There is nothing left to catch.' },
-    { id: 'standing', name: 'Standing', what: 'What the rest of the world thinks of Skerry.', high: 'Other countries lend, trade and give Skerrans visas.', zero: 'No foreign bank or government will deal with Skerry.' }
+    { id: 'treasury', name: 'Treasury', what: 'The government’s money. Wages come out of it four times a year, whatever else happens.' },
+    { id: 'trust', name: 'Trust', what: 'How much Skerrans support their government. It drops when the Council does something the island dislikes.' },
+    { id: 'reef', name: 'Reef', what: 'The condition of the sea and the land. Most families on the island live from fishing, so they depend on it.' },
+    { id: 'standing', name: 'Standing', what: 'Skerry’s reputation in other countries. It affects whether they give Skerrans visas and lend the government money.' }
   ];
 
   const INTRO = {
-    place: 'Port Skerry, 1 January',
-    headline: 'The Republic of Skerry is one day old.',
     story: [
-      'At midnight the mainland’s flag was lowered over the harbour, and most of the island stayed up to watch. Skerry is now a country of 9,400 people, the smallest with a seat at the United Nations, on an island that a cyclist can cross before lunch.',
-      'The new state has a hospital, a school and a ferry. It has no army and no bank of its own, the sea wall it needs has not been built, and it spends more each year than it earns.',
-      'You are its first Council of Ministers. Nobody has done the job before you. Three outsiders will take an interest in whatever you decide: Meridia, the large country next door; the Northern Bloc, where most young Skerrans go to study and work; and Aldwych & Rook, the London firm that paid for the independence campaign.'
+      'Skerry is an island in the Pacific with 9,400 people on it. Until yesterday it was governed from the mainland. Today is its first day as an independent country, and you are its government.',
+      'It is a poor country. Most families live from fishing. The government runs the hospital, the school and the ferry, and every year it spends more than it collects.',
+      'Two other places will come up again and again. Meridia is the big country next door. The Northern Bloc is a group of rich countries where most young Skerrans go to study or to find work.'
     ],
     sheet: 'Skerry in brief',
     facts: [
@@ -43,23 +41,26 @@
       ['The state spends', '$40 million a year'],
       ['The state earns', 'less than that']
     ],
+    game: 'You govern Skerry for one year. In that time seven or eight problems reach the Council, one after another. Each one is called a dispatch. You argue about it and vote, and then the screen tells you what happened. The screen also keeps four scores for the country, which are called gauges.',
     charter: {
       title: 'The Charter of the Republic of Skerry',
       date: 'Port Skerry, 1 January',
-      lead: 'Before the Council governs, it has to write the Charter. There are four articles, and you vote on each one. None of you knows yet which ministry you will be given.',
+      lead: 'Before the first dispatch you write the Charter, which is Skerry’s constitution. It has four articles. For each article the screen offers three versions, and you vote for one of them.',
       points: [
-        'The Charter binds you. Each article will matter again later in the year, and the Council can only go against it if every minister agrees.',
-        'When the Charter is signed, your phone will tell you which ministry is yours and which gauge is your score. It will also tell you what you promised somebody in order to get the job.'
+        'The Charter comes back later. Four of the dispatches are about something it covers, and in those you can only go against the Charter if all of you vote to.',
+        'When the Charter is finished, each of you scans a code with your phone and is given a ministry. Keep it secret. Your ministry has one of the four gauges, and your score is whatever that gauge shows at the end of the year.',
+        'Your phone also names one decision that you have promised somebody the Council will take. If the Council takes it, you score 5 more points. Each marker you have not used is worth 1 point. The highest score wins.'
       ]
     }
   };
 
   const RULES = [
-    'The Chair reads each dispatch aloud. You argue until the bell goes, then vote by a show of hands. The majority wins, and if the vote is tied the Chair decides.',
-    'Under each option you can see what it will do to the gauges. Occasionally there are only question marks, and you have to vote without knowing.',
-    'Before every second dispatch the state pays its wages, and the Treasury loses a point.',
-    'If a gauge falls to zero there is an emergency, and you must give up two points of another gauge to rescue it. At the second emergency the government falls.',
-    'Each of you has two markers. Spend one and your vote counts twice. You can also give a marker to another minister, in return for whatever the two of you agree.'
+    'Every dispatch has a Chair, and the screen shows who it is. The Chair reads the dispatch aloud and then reads out the options.',
+    'You have three minutes to argue. When the bell goes, everybody votes by raising a hand. The option with the most votes wins, and if two options are level the Chair chooses.',
+    'Under each option the screen shows how it will change the gauges. A few options show question marks instead, and then you have to guess.',
+    'Each of you has two markers. Hand one in when you vote and your vote counts as two. You can also give a marker to another minister, for example in return for a vote.',
+    'Four times in the year the state pays its wages, and the Treasury loses a point.',
+    'If a gauge falls to 0, you have to take two points from another gauge to bring it back to 2. The second time this happens, your government has fallen. You play on to the end of the year, but the final screen will say that it fell.'
   ];
 
   // Each article binds one of the four dispatches on which a minister has made a private promise.
@@ -75,7 +76,7 @@
     },
     {
       id: 'safe', title: 'Article 2', binds: 'union', question: 'Who defends Skerry?',
-      text: 'Skerry has no army and no navy. It has one police launch. Meridia, next door, has a fleet.',
+      text: 'Skerry has no army or navy, only a police launch. Meridia has a fleet.',
       options: [
         { id: 'neutral', label: 'Nobody', pitch: 'Skerry stays neutral. It has no army and joins no alliance.', law: 'The Republic is neutral. It keeps no army and signs no treaty that binds it in matters of defence.', fx: { trust: 1, standing: -1 } },
         { id: 'friend', label: 'A larger country', pitch: 'Skerry asks a bigger state to protect it, and signs a treaty to that effect.', law: 'The Republic keeps no army. It seeks the protection of a larger friendly state by treaty.', fx: { standing: 1, trust: -1 } },
@@ -93,7 +94,7 @@
     },
     {
       id: 'lang', title: 'Article 4', binds: 'school', question: 'Which language does Skerry use for government and school?',
-      text: 'Everybody speaks Skerran at home. Contracts, medicine and the internet are in English.',
+      text: 'Everybody speaks Skerran at home, but business and medicine are done in English.',
       options: [
         { id: 'skerran', label: 'Skerran', pitch: 'Government and schools work in Skerran. English is taught as a foreign language.', law: 'Skerran is the language of the Republic and of its schools.', fx: { trust: 2, standing: -1 } },
         { id: 'both', label: 'Both', pitch: 'Two official languages with equal status. Every document is printed twice.', law: 'Skerran and English are the languages of the Republic and have equal status.', fx: { treasury: -1 } },

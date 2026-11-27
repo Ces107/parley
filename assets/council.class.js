@@ -6,7 +6,7 @@
 
   const META = {
     title: 'The Free State of Tarn',
-    lead: 'A new country and its first year. Everyone needs a pencil, some paper and two markers. Cut the markers from the printed sheet, or use coins.',
+    lead: 'You govern a new country for its first year. Each player needs a pencil, some paper and two markers. Cut the markers from the printed sheet, or use two coins.',
     bill: 'The teachers, the road crews and the clinic staff have been paid.',
     verdicts: {
       fell: 'The government fell before the year was out.',
@@ -18,19 +18,17 @@
   };
 
   const GAUGES = [
-    { id: 'treasury', name: 'Treasury', what: 'The money the state has to spend.', high: 'The roads are cleared and the teachers are paid on time.', zero: 'Nobody who works for the state is paid.' },
-    { id: 'trust', name: 'Trust', what: 'How far the people of the valley believe in their own government.', high: 'People will put up with a hard decision.', zero: 'People stop doing what the Council says.' },
-    { id: 'land', name: 'Mountain', what: 'The state of the valley’s land, water and ice. Almost everybody here makes a living from them.', high: 'There is snow in winter and water in summer.', zero: 'There is nothing left to farm, ski on or sell.' },
-    { id: 'standing', name: 'Standing', what: 'What the rest of the world thinks of Tarn.', high: 'Other countries lend, trade and keep their borders open.', zero: 'No foreign bank or government will deal with Tarn.' }
+    { id: 'treasury', name: 'Treasury', what: 'The government’s money. Wages come out of it four times a year, whatever else happens.' },
+    { id: 'trust', name: 'Trust', what: 'How much the people of the valley support their government. It drops when the Council does something the villages dislike.' },
+    { id: 'land', name: 'Mountain', what: 'The condition of the valley’s land and water. The farms and the ski areas depend on it, and so do the dams.' },
+    { id: 'standing', name: 'Standing', what: 'Tarn’s reputation in other countries. It affects whether they trade with the valley and lend the government money.' }
   ];
 
   const INTRO = {
-    place: 'Tarn, 1 January',
-    headline: 'The Free State of Tarn is one day old.',
     story: [
-      'At midnight every church bell in the valley rang for an hour. For six hundred years Tarn was ruled by the Abbot of Saint Aurel, and no Abbot ever came to see it. Since midnight it has been a country of 7,200 people, in a valley that takes half an hour to drive from end to end.',
-      'The valley has three dams, a glacier, two ski areas and three banks, which between them hold thirty times as much money as the state spends in a year. The state itself has a school, a clinic and an army of sixty-one men, and its taxes have never covered half of what it costs to run.',
-      'You are its first Council of Ministers. Nobody has done the job before you. Two neighbours will take an interest in whatever you decide. Arlen is large, buys the valley’s electricity and supported its independence. Vara, just across the border, is happy to take any business that Tarn turns away.'
+      'Tarn is a mountain valley with 7,200 people in it. For six hundred years it belonged to the Abbey of Saint Aurel, and the Abbot ruled it without ever visiting. At midnight it became an independent country, and you are its government.',
+      'Tarn has three dams, which make more electricity than the valley can use, two ski areas and three banks. The banks hold thirty times what the government spends in a year. The government itself is short of money. It spends about $50 million a year and has never collected half of that in taxes.',
+      'Two neighbours will come up again and again. Arlen is a big country that buys Tarn’s electricity and supported its independence. Vara is a small one just across the border, and businesses that are turned away from Tarn usually end up there.'
     ],
     sheet: 'Tarn in brief',
     facts: [
@@ -42,30 +40,33 @@
       ['The state spends', '$50 million a year'],
       ['The state raises', 'less than half of that']
     ],
+    game: 'You govern Tarn for one year. In that time seven or eight problems reach the Council, one after another. Each one is called a dispatch. You argue about it and vote, and then the screen tells you what happened. The screen also keeps four scores for the country, which are called gauges.',
     charter: {
       title: 'The Charter of the Free State of Tarn',
       date: 'Tarn, 1 January',
-      lead: 'Before the Council governs, it has to write the Charter. There are four articles, and you vote on each one. None of you knows yet which ministry you will be given.',
+      lead: 'Before the first dispatch you write the Charter, which is Tarn’s constitution. It has four articles. For each article the screen offers three versions, and you vote for one of them.',
       points: [
-        'The Charter binds you. Each article will matter again later in the year, and the Council can only go against it if every minister agrees.',
-        'When the Charter is signed, your phone will tell you which ministry is yours and which gauge is your score. It will also tell you what you promised somebody in order to get the job.'
+        'The Charter comes back later. Four of the dispatches are about something it covers, and in those you can only go against the Charter if all of you vote to.',
+        'When the Charter is finished, each of you scans a code with your phone and is given a ministry. Keep it secret. Your ministry has one of the four gauges, and your score is whatever that gauge shows at the end of the year.',
+        'Your phone also names one decision that you have promised somebody the Council will take. If the Council takes it, you score 5 more points. Each marker you have not used is worth 1 point. The highest score wins.'
       ]
     }
   };
 
   const RULES = [
-    'The Chair reads each dispatch aloud. You argue until the bell goes, then vote by a show of hands. The majority wins, and if the vote is tied the Chair decides.',
-    'Under each option you can see what it will do to the gauges. Occasionally there are only question marks, and you have to vote without knowing.',
-    'Before every second dispatch the state pays its wages, and the Treasury loses a point.',
-    'If a gauge falls to zero there is an emergency, and you must give up two points of another gauge to rescue it. At the second emergency the government falls.',
-    'Each of you has two markers. Spend one and your vote counts twice. You can also give a marker to another minister, in return for whatever the two of you agree.'
+    'Every dispatch has a Chair, and the screen shows who it is. The Chair reads the dispatch aloud and then reads out the options.',
+    'You have three minutes to argue. When the bell goes, everybody votes by raising a hand. The option with the most votes wins, and if two options are level the Chair chooses.',
+    'Under each option the screen shows how it will change the gauges. A few options show question marks instead, and then you have to guess.',
+    'Each of you has two markers. Hand one in when you vote and your vote counts as two. You can also give a marker to another minister, for example in return for a vote.',
+    'Four times in the year the state pays its wages, and the Treasury loses a point.',
+    'If a gauge falls to 0, you have to take two points from another gauge to bring it back to 2. The second time this happens, your government has fallen. You play on to the end of the year, but the final screen will say that it fell.'
   ];
 
   // Each article binds one of the four dispatches on which a minister has made a private promise.
   const CHARTER = [
     {
       id: 'cit', title: 'Article 1', binds: 'cowbells', question: 'Who can become a citizen of Tarn?',
-      text: 'A quarter of the people in the valley were born somewhere else. They run the hotels, the dams and the clinic. The Charter has to say how a newcomer becomes a citizen.',
+      text: 'A quarter of the people in the valley were born somewhere else, and many of them have lived here for decades. The Charter has to say how a newcomer becomes a citizen.',
       options: [
         { id: 'descent', label: 'By descent', pitch: 'Only the children of citizens. Anyone else remains a guest, however long they stay.', law: 'The citizens of Tarn are the people born in the valley before independence, and their children. Nobody else can become one.', fx: { trust: 1, treasury: -1 } },
         { id: 'state', label: 'By the state', pitch: 'After ten years in the valley and a language test, an office in the capital decides.', law: 'A person who has lived in the valley for ten years and speaks its language may be made a citizen by the state.', fx: { standing: 1, trust: -1 } },
@@ -83,7 +84,7 @@
     },
     {
       id: 'tax', title: 'Article 3', binds: 'disc', question: 'How does Tarn pay for itself?',
-      text: 'Roads, a school, a clinic and avalanche barriers cost about $50 million a year. The valley’s taxes have never raised half of that.',
+      text: 'Running the valley costs about $50 million a year, and its taxes have never raised half of that.',
       options: [
         { id: 'income', label: 'An income tax', pitch: 'Everybody pays twelve per cent of what they earn.', law: 'Every person in the valley pays tax on their income at a single rate.', fx: { treasury: 2, trust: -1 } },
         { id: 'haven', label: 'No income tax', pitch: 'Companies and their owners are welcome here, and nobody asks them many questions.', law: 'There is no tax on income. People who bring their business to the valley are welcome, and their affairs are private.', fx: { treasury: 2, standing: -1 } },

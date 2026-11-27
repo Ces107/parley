@@ -206,19 +206,15 @@
   }
 
   // The phrase bank shown as "on the record" strips: advanced ways of arguing.
+  // Ten phrases for a discussion that has to end in a decision: the functions Cambridge lists for the
+  // C2 Proficiency collaborative task (giving opinions, eliciting, speculating, evaluating, negotiating).
   const PHRASES = [
-    'I have grave misgivings about…', 'For the sake of argument, let us assume…', 'Be that as it may…',
-    'I would venture to suggest…', 'That argument does not hold water.', 'The crux of the matter is…',
-    'With the best will in the world…', 'I take your point, but…', 'It might be prudent to…',
-    'That is beside the point.', 'Let me play devil’s advocate.', 'Can we meet halfway?',
-    'I am not prepared to concede that.', 'It is a moot point.', 'Reading between the lines…',
-    'To put it another way…', 'I remain unconvinced.', 'That is the thin end of the wedge.',
-    'We are miles apart on this.', 'You have hit the nail on the head.', 'To put it bluntly…',
-    'By the same token…', 'That raises the question of…', 'I stand corrected.',
-    'Far be it from me to…', 'It strikes me as short-sighted.', 'On balance, I would rather…',
-    'That is a false economy.', 'Let us not get bogged down in detail.', 'Hindsight is a wonderful thing.',
-    'I would be loath to…', 'It does not bear thinking about.', 'There is no getting away from the fact that…',
-    'That is easier said than done.', 'At the risk of stating the obvious…', 'It cuts both ways.'
+    'I’m inclined to think that…', 'The way I see it, …',
+    'What’s your take on this?',
+    'In all likelihood, …', 'There’s a real danger that…',
+    'To a certain extent, yes, but…', 'What tips the balance for me is…',
+    'I see where you’re coming from, but…', 'I’m not sure I’d go that far.',
+    'I couldn’t agree more.'
   ];
   function phrases(seed, n) { return sample(PHRASES, n || 3, rng('ph' + seed)); }
 
