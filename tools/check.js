@@ -16,6 +16,12 @@ function council(v) {
   load('council.' + v + '.js');
   const C = globalThis.COUNCIL, gids = C.GAUGES.map(g => g.id), tag = 'council/' + v + ': ';
   ok(C.META && C.META.title && C.META.bill && C.META.verdicts.ok, tag + 'META');
+  [0, 1, 2, 9].forEach(n => ok(typeof C.META.charterLine(n) === 'string' && C.META.charterLine(n).length > 20 && !/undefined/.test(C.META.charterLine(n)), tag + 'charter line ' + n));
+  const I = C.INTRO;
+  ok(I && I.place && I.headline && I.story.length === 3 && I.sheet && I.facts.length >= 6 && I.facts.every(f => f.length === 2), tag + 'INTRO');
+  ok(I.charter.title && I.charter.date && I.charter.lead && I.charter.points.length === 2, tag + 'INTRO.charter');
+  C.GAUGES.forEach(g => ok(g.name && g.what && g.high && g.zero, tag + 'gauge text ' + g.id));
+  ok(C.RULES.length === 5, tag + 'five rules');
   ok(gids.length === 4 && new Set(gids).size === 4, tag + 'four gauges');
   const pids = Object.keys(C.PORTFOLIOS);
   for (let t = 0; t < 300; t++) {
@@ -50,6 +56,21 @@ function council(v) {
   const flags = new Set();
   Object.values(C.CRISES).concat(Object.values(C.RECKONING)).forEach(c => c.options.forEach(o => { if (o.flag) flags.add(o.flag); }));
   Object.keys(C.EPILOGUE.flags).forEach(f => ok(flags.has(f), tag + 'epilogue line never used: ' + f));
+  // Each article binds one promise dispatch, and all four promise dispatches are bound.
+  ok(C.CHARTER.length === 4 && new Set(C.CHARTER.map(a => a.binds)).size === 4, tag + 'four articles, four dispatches');
+  C.CHARTER.forEach(a => {
+    const c = C.CRISES[a.binds];
+    ok(C.PROMISE_CRISES.includes(a.binds) && c && typeof c.guard === 'function', tag + 'article binds a promise dispatch: ' + a.id);
+    let bites = 0;
+    a.options.forEach(o => {
+      ok(o.law && o.law.length > 20 && o.label && o.pitch, tag + 'article option text ' + a.id + ':' + o.id);
+      const gd = c.guard({ [a.id]: o.id });
+      ok(gd && gd.why && Array.isArray(gd.options), tag + 'the Charter says something on ' + a.binds + ' under ' + o.id);
+      if (gd && gd.options.length) bites++;
+      ok(!gd || gd.options.length < c.options.length, tag + 'a guard may not bind every option: ' + a.binds + ' under ' + o.id);
+    });
+    ok(bites >= 1, tag + 'no choice in ' + a.id + ' binds ' + a.binds);
+  });
   // Every charter choice that a guard mentions must exist, and guarded options must exist.
   C.CHARTER.forEach(a => a.options.forEach(o => {
     Object.keys(o.fx).forEach(g => ok(gids.includes(g), tag + 'charter fx ' + g));
@@ -96,6 +117,15 @@ function council(v) {
   }
   simulate(false);
   simulate(true);
+  // How each article leaves the minister it binds: promise blocked (needs every vote), protected (the other side needs every vote) or open.
+  console.log(tag + 'charter and promises: ' + C.CHARTER.map(a => {
+    const pid = pids.find(k => C.PORTFOLIOS[k].promise.crisis === a.binds), keeps = C.PORTFOLIOS[pid].promise.keeps, c = C.CRISES[a.binds];
+    return a.id + ' → ' + pid + ' [' + a.options.map(o => {
+      const need = x => c.guard({ [a.id]: o.id }).options.includes(x) || !!c.options.find(y => y.id === x).unanimous;
+      const mine = keeps.every(need), theirs = c.options.filter(x => !keeps.includes(x.id)).every(x => need(x.id));
+      return o.id + ' ' + (mine ? 'blocked' : theirs ? 'protected' : 'open');
+    }).join(', ') + ']';
+  }).join('; '));
 }
 
 // ---------- The Leak ----------

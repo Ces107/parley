@@ -29,11 +29,11 @@
     const lines = C.CHARTER.map((_, i) => 'Article ' + (i + 1)).concat(Array.from({ length: C.PROMISE_CRISES.length + 4 }, (_, i) => 'Dispatch ' + (i + 1)), ['The reckoning']);
     const cols = C.GAUGES.map(x => '<th style="width:10%">' + esc(x.name) + '</th>').join('');
     return '<section class="page"><div class="lab">The Council · ' + which + ' · print one per player</div><h2>Minister’s sheet</h2>' + nameLine +
-      '<p style="margin:0 0 4mm">Markers: ◯ ◯ &nbsp; (cross one out when you spend it; hand over a coin when you give one away)</p>' +
+      '<p style="margin:0 0 4mm">Markers: ◯ ◯ &nbsp; (cross one out when you spend it, and hand over a coin when you give one away)</p>' +
       '<table><tr><th style="width:18%"></th><th>What the Council decided</th>' + cols + '</tr>' +
       '<tr><td>Start</td><td></td>' + C.GAUGES.map(() => '<td>5</td>').join('') + '</tr>' +
       lines.map(l => '<tr><td style="height:9mm">' + l + '</td><td></td>' + C.GAUGES.map(() => '<td></td>').join('') + '</tr>').join('') + '</table>' +
-      '<h3>On the record: use them, tick them</h3><p style="columns:2;font-size:9.5pt;margin:0">' + K.PHRASES.slice(0, 24).map(p => '☐ ' + esc(p)).join('<br>') + '</p></section>' +
+      '<h3>Phrases to try. Tick each one when you use it.</h3><p style="columns:2;font-size:9.5pt;margin:0">' + K.PHRASES.slice(0, 24).map(p => '☐ ' + esc(p)).join('<br>') + '</p></section>' +
       '<section class="page"><div class="lab">The Council · the same sheet, other side</div><h2>Language</h2>' + nameLine + gems +
       '<h3>Fifty words (optional)</h3><div class="box" style="min-height:55mm"></div></section>';
   }

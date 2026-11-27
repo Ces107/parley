@@ -208,13 +208,13 @@
   // The phrase bank shown as "on the record" strips: advanced ways of arguing.
   const PHRASES = [
     'I have grave misgivings about…', 'For the sake of argument, let us assume…', 'Be that as it may…',
-    'I would venture to suggest…', 'That argument holds no water.', 'The crux of the matter is…',
+    'I would venture to suggest…', 'That argument does not hold water.', 'The crux of the matter is…',
     'With the best will in the world…', 'I take your point, but…', 'It might be prudent to…',
     'That is beside the point.', 'Let me play devil’s advocate.', 'Can we meet halfway?',
     'I am not prepared to concede that.', 'It is a moot point.', 'Reading between the lines…',
-    'Put simply, albeit reductively…', 'I remain unconvinced.', 'That is the thin end of the wedge.',
+    'To put it another way…', 'I remain unconvinced.', 'That is the thin end of the wedge.',
     'We are miles apart on this.', 'You have hit the nail on the head.', 'To put it bluntly…',
-    'By the same token…', 'That begs the question of…', 'I stand corrected.',
+    'By the same token…', 'That raises the question of…', 'I stand corrected.',
     'Far be it from me to…', 'It strikes me as short-sighted.', 'On balance, I would rather…',
     'That is a false economy.', 'Let us not get bogged down in detail.', 'Hindsight is a wonderful thing.',
     'I would be loath to…', 'It does not bear thinking about.', 'There is no getting away from the fact that…',

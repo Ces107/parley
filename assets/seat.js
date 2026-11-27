@@ -17,9 +17,15 @@
   function council() {
     const C = window.COUNCIL, id = C.portfoliosFor(room, n)[seat], p = C.PORTFOLIOS[id];
     if (!p) return '<p>Unknown seat.</p>';
+    // The host screen passes the Charter the table has just signed, so the brief can say what it means for this promise.
+    const picks = String(P.c || '').split('.'), f = {};
+    C.CHARTER.forEach((a, i) => { if (a.options.some(o => o.id === picks[i])) f[a.id] = picks[i]; });
+    const crisis = C.CRISES[p.promise.crisis], guard = Object.keys(f).length === C.CHARTER.length && crisis.guard ? crisis.guard(f) : null;
     return cover('Your ministry', '<div class="lab">' + esc(C.META.title) + '</div><h1>' + esc(p.title) + '</h1>' +
-      '<p style="margin-top:.8rem">' + esc(p.brief[0]) + '</p><div class="secret">' + esc(p.brief[1]) + '</div><div class="want">' + esc(p.brief[2]) + '</div>' +
-      '<p class="dim">Argue as a minister. Nobody needs to know what you owe, or to whom.</p>');
+      '<p style="margin-top:.8rem">' + esc(p.brief[0]) + '</p><div class="secret">' + esc(p.brief[1]) + '</div>' +
+      (guard ? '<div class="sheet" style="margin:.8rem 0"><div class="lab" style="margin-bottom:.3rem">The Charter you signed</div>' + esc(guard.why) + '</div>' : '') +
+      '<div class="want">' + esc(p.brief[2]) + '</div>' +
+      '<p class="dim">Keep all of this to yourself until the scores are shown.</p>');
   }
 
   // ---------- The Leak ----------

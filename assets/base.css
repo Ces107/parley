@@ -136,6 +136,7 @@ input[type=text]:focus, input[type=number]:focus, textarea:focus { outline: 3px 
 .opt span { color: var(--ink-2); font-size: .95rem; }
 .opt .fx { font-family: var(--mono); font-size: .78rem; letter-spacing: .04em; color: var(--ink); margin-top: .25rem; display: flex; gap: .7rem; flex-wrap: wrap; }
 .opt .fx .up { color: var(--green); } .opt .fx .down { color: var(--red); }
+.opt .fx .q { color: var(--ink-2); letter-spacing: .2em; }
 .opt.won { background: var(--yellow); }
 .opt.lost { opacity: .4; box-shadow: none; }
 .opts.locked .opt { cursor: default; pointer-events: none; }
@@ -166,6 +167,19 @@ button.chip { cursor: pointer; font: inherit; font-family: var(--mono); font-wei
 .doc th { font-weight: 600; background: #0000000d; }
 .doc .press { font-family: Georgia, 'Times New Roman', serif; font-size: 1.05rem; line-height: 1.5; }
 .doc .press h5 { font-family: Georgia, serif; font-size: 1.7rem; line-height: 1.1; margin: 0 0 .5rem; }
+/* The Council: gauge cards in the briefing, the Charter as a document, and the overlay that shows it. */
+.gcards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.2rem; }
+.gcard { background: var(--sheet); border: 2px solid var(--ink); padding: .8rem .9rem 1rem; }
+.gcard .gauge { border: 0; padding: 0; background: none; }
+.gcard p { margin: .8rem 0 .7rem; font-size: 1.05rem; line-height: 1.4; }
+.gcard dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: .35rem .7rem; font-size: .95rem; }
+.gcard dt { font-family: var(--mono); font-weight: 600; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--red); padding-top: .2rem; white-space: nowrap; }
+.gcard dd { margin: 0; color: var(--ink-2); }
+.doc.charter { font-family: Georgia, 'Times New Roman', serif; font-size: 1.12rem; line-height: 1.5; padding: 1.5rem 1.8rem; box-shadow: .4rem .4rem 0 var(--ink); }
+.doc.charter p { margin: 0 0 .7rem; }
+.doc.charter .sig { margin: 1.1rem 0 0; font-style: italic; color: var(--ink-2); }
+.veil { position: fixed; inset: 0; z-index: 9; background: #161412cc; display: grid; place-items: center; padding: 2rem; cursor: pointer; }
+.veil .doc { max-width: 46rem; width: 100%; }
 .docs { display: grid; grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr)); gap: 1.1rem; }
 .stamp { position: absolute; right: 1rem; top: 2.6rem; font-family: var(--display); color: var(--red); border: 3px solid var(--red); padding: .1rem .5rem; transform: rotate(-7deg); font-size: .8rem; opacity: .8; }
 
@@ -180,6 +194,7 @@ table.score tr.top td { background: var(--yellow); }
 ul.plain { list-style: none; padding: 0; margin: 0; }
 ul.plain li { padding: .35rem 0; border-bottom: 1px solid var(--line); }
 ol.steps { padding-left: 1.2rem; margin: .4rem 0 0; } ol.steps li { margin-bottom: .35rem; }
+ol.steps.big li { font-size: 1.16rem; line-height: 1.45; margin-bottom: .7rem; }
 details { margin-top: 1rem; } summary { cursor: pointer; font-family: var(--mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
 .agenda { display: grid; grid-template-columns: auto 1fr auto; gap: .2rem 1rem; font-family: var(--mono); font-size: .88rem; }
 .agenda b { font-weight: 600; }
@@ -234,6 +249,7 @@ body.phone { background-size: 2.2rem 2.2rem; }
 }
 @media (max-width: 760px) {
   .gauges { grid-template-columns: repeat(2, 1fr); }
+  .gcards { grid-template-columns: repeat(2, 1fr); }
   .split { grid-template-columns: 1fr; }
   h1 { font-size: 2.1rem; } h2 { font-size: 1.5rem; }
   .word { font-size: 2.6rem; } .subject { font-size: 2rem; } .big { font-size: 2.2rem; }
