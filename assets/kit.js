@@ -152,7 +152,8 @@
     const el = $('#clock'); if (!el) return;
     const paint = () => {
       const s = getStart();
-      el.innerHTML = s ? fmt((Date.now() - s) / 1000) + ' <i>/ ' + (total || 90) + ':00</i>' : '';
+      const all = typeof total === 'function' ? total() : total;
+      el.innerHTML = s ? fmt((Date.now() - s) / 1000) + ' <i>/ ' + (Number(all) || 90) + ':00</i>' : '';
     };
     paint(); setInterval(paint, 1000);
   }

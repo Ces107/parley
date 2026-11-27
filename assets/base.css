@@ -101,10 +101,10 @@ a { color: inherit; }
 .foot { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .6rem 1.2rem; background: linear-gradient(transparent, var(--paper) 35%); pointer-events: none; }
 .foot > * { pointer-events: auto; }
 
-input[type=text], textarea {
+input[type=text], input[type=number], textarea {
   font: inherit; font-family: var(--text); background: var(--sheet); border: 2px solid var(--ink); padding: .55rem .7rem; width: 100%; color: var(--ink);
 }
-input[type=text]:focus, textarea:focus { outline: 3px solid var(--yellow); }
+input[type=text]:focus, input[type=number]:focus, textarea:focus { outline: 3px solid var(--yellow); }
 
 /* ---------- timer ---------- */
 .timer { font-family: var(--display); font-size: 4.2rem; line-height: 1; font-variant-numeric: tabular-nums; display: inline-flex; align-items: baseline; gap: .8rem; }

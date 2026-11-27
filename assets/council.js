@@ -7,16 +7,20 @@
   const GID = D.GAUGES.map(g => g.id);
   const app = $('#app');
   const T = { charter: 240, crisis: 210, emergency: 90, write: 360, review: 300 };
+  // Minutes: one dispatch from reading to outcome; the reckoning, epilogue, record and gems together; the optional writing.
+  const PACE = { dispatch: 6.5, ending: 16.5, write: 6 };
   let S = LS.get();
 
   function fresh() {
     return {
       v: 1, room: K.newCode(5), names: ['', '', '', ''], n: 0, phase: 'setup', i: 0, sub: 'read', turn: 0,
       g: GID.reduce((o, id) => { o[id] = 5; return o; }, {}), f: {}, flags: {}, picks: {}, order: [], reck: null,
-      emergencies: 0, fell: false, zero: null, timer: null, started: 0, delta: null, ask: null, markers: [2, 2, 2, 2], sure: false, bill: false, hold: false
+      emergencies: 0, fell: false, zero: null, timer: null, started: 0, delta: null, ask: null, markers: [2, 2, 2, 2], sure: false, bill: false, hold: false,
+      len: 90, cut: 0
     };
   }
   if (!S || S.v !== 1 || !S.g || GID.some(id => S.g[id] == null)) S = fresh();
+  if (!S.len) S.len = 90;
   const save = () => LS.set(S);
 
   const clock = K.Countdown({ id: 'main', get: () => S.timer, set: t => { S.timer = t; save(); } });
@@ -66,6 +70,7 @@
     return '<div class="stage narrow"><div class="kicker"><span>90 minutes · 3 or 4 players</span></div><h1>The Council</h1>' +
       '<p class="lead" style="margin-top:1rem">' + esc(D.META.lead) + '</p>' +
       '<div class="sheet" style="margin-top:1.4rem"><div class="lab" style="margin-bottom:.6rem">Who is at the table, in seating order</div><div class="row">' + inputs + '</div>' +
+      '<div class="lab" style="margin:1rem 0 .6rem">Minutes we have</div><div class="row"><input type="number" min="45" max="180" step="5" data-len value="' + esc(S.len) + '" style="flex:0 0 7rem"></div>' +
       '<div class="btns"><button class="btn go" data-act="begin" data-next>Begin →</button><a class="btn ghost" href="print.html?g=council&v=' + V + '" target="_blank">Print the minister’s sheet</a></div></div></div>';
   }
   function vRules() {
@@ -115,16 +120,22 @@
     return '<div class="stage">' + gauges(false) + kicker(label) + '<h2>' + esc(c.title) + '</h2>' +
       '<div class="split"><div><p class="lead">' + esc(c.text(S.f)) + '</p>' +
       (S.bill && S.phase === 'crisis' ? '<div class="note"><span class="lab">Quarter day</span>' + esc(D.META.bill) + ' ' + esc(gname(GID[0])) + ' −1.</div>' : '') +
+      (S.cut && S.i > 0 && S.phase === 'crisis' ? '<div class="note"><span class="lab">The clock</span>The year is running short: ' + (S.cut === 1 ? 'one dispatch has' : S.cut + ' dispatches have') + ' been set aside.</div>' : '') +
       (guard ? '<div class="note" style="border-color:var(--red)"><span class="lab">The Charter</span>' + esc(guard.why) + '</div>' : '') +
       timerBox() + phraseStrip('cr' + id) + '</div>' +
       '<div><div class="opts col">' + c.options.map((o, k) => '<button class="opt" data-act="pick" data-id="' + o.id + '"><span class="k">' + 'ABC'[k] + '</span><b>' + esc(o.label) + '</b><span>' + esc(o.pitch) + '</span>' + fxLine(o.fx) + (needs(o) ? '<span class="lab red">Unanimous only</span>' : '') + '</button>').join('') + '</div>' + ask + '</div></div></div>';
   }
   function vEmergency() {
-    const others = D.GAUGES.filter(g => g.id !== S.zero && S.g[g.id] > 0);
+    const others = D.GAUGES.filter(g => g.id !== S.zero && S.g[g.id] >= 2);
+    const said = !S.fell ? 'One more emergency and the government falls.'
+      : S.emergencies === 2 ? 'This is the second emergency: the government has fallen. You see the year out as caretakers.'
+      : 'The caretakers have another emergency on their hands.';
     return '<div class="stage">' + gauges(false) + '<div class="kicker"><span>State of emergency</span></div>' +
       '<h2 class="red">' + esc(gname(S.zero)) + ' has reached zero.</h2>' +
-      '<p class="lead" style="margin-top:.8rem">To restore it to 2, the Council gives up two points of another gauge. One more emergency and the government falls.</p>' +
-      '<div class="opts">' + others.map(g => '<button class="opt" data-act="sacrifice" data-id="' + g.id + '"><b>Give up ' + esc(g.name) + '</b>' + fxLine({ [g.id]: -2 }) + '</button>').join('') + '</div>' + timerBox() + '</div>';
+      '<p class="lead" style="margin-top:.8rem">To restore it to 2, the Council gives up two points of another gauge. ' + said + '</p>' +
+      '<div class="opts">' + (others.length
+        ? others.map(g => '<button class="opt" data-act="sacrifice" data-id="' + g.id + '"><b>Give up ' + esc(g.name) + '</b>' + fxLine({ [g.id]: -Math.min(2, S.g[g.id] - 1) }) + '</button>').join('')
+        : '<button class="opt" data-act="sacrifice" data-id=""><b>There is nothing left to give</b></button>') + '</div>' + timerBox() + '</div>';
   }
   function epilogueLines() {
     const band = v => v <= 2 ? 0 : v >= 7 ? 2 : 1;
@@ -187,28 +198,39 @@
   }
 
   // ---------- flow ----------
-  function afterOutcome() {
-    const zero = D.GAUGES.map(g => g.id).find(id => S.g[id] <= 0);
-    if (zero) {
-      S.emergencies++;
-      if (S.emergencies >= 2) { S.fell = true; S.phase = 'epilogue'; return; }
-      S.zero = zero; S.phase = 'emergency'; setTimer(T.emergency); return;
+  function alarm(id) {
+    // A gauge has reached zero. The second time, the government falls; the year is played out all the same.
+    S.emergencies++; if (S.emergencies >= 2) S.fell = true;
+    S.zero = id; S.phase = 'emergency'; setTimer(T.emergency);
+  }
+  function live() { const m = (Date.now() - S.started) / 60000; return m <= S.len + 30 ? m : null; }
+  function fit() {
+    // As dispatch S.i is about to be read: set aside later dispatches that no longer fit in the session.
+    // Never the opening one, never one that a minister at the table has a promise on.
+    S.cut = 0;
+    const mins = live(); if (mins == null) return;   // an old saved game, not a session in progress
+    const kept = [D.FIRST].concat(D.portfoliosFor(S.room, S.n).map(p => D.PORTFOLIOS[p].promise.crisis));
+    while (mins + (S.order.length - S.i) * PACE.dispatch + PACE.ending > S.len) {
+      let k = -1;
+      for (let j = S.order.length - 1; j > S.i; j--) if (kept.indexOf(S.order[j]) < 0) { k = j; break; }
+      if (k < 0) break;
+      S.order.splice(k, 1); S.cut++;
     }
+  }
+  function afterOutcome() {
+    const zero = GID.find(id => S.g[id] <= 0);
+    if (zero) { alarm(zero); return; }
     advance();
   }
   function advance() {
     if (S.phase === 'emergency') S.phase = S.back || 'crisis';
     if (S.phase === 'crisis') {
       if (S.i < S.order.length - 1) {
-        S.i++; S.sub = 'read'; S.turn++; S.bill = false; setTimer(T.crisis);
+        S.i++; S.sub = 'read'; S.turn++; S.bill = false; setTimer(T.crisis); fit();
         if (D.BILLS.indexOf(S.i) >= 0) {
           // Quarter day: the wages fall due before this dispatch is read.
           S.g[GID[0]] = clamp(S.g[GID[0]] - 1); S.bill = true;
-          if (S.g[GID[0]] <= 0) {
-            S.emergencies++;
-            if (S.emergencies >= 2) { S.fell = true; S.phase = 'epilogue'; return; }
-            S.zero = GID[0]; S.back = 'crisis'; S.hold = true; S.phase = 'emergency'; setTimer(T.emergency);
-          }
+          if (S.g[GID[0]] <= 0) { S.back = 'crisis'; S.hold = true; alarm(GID[0]); }
         }
       }
       else {
@@ -230,6 +252,7 @@
       const list = S.names.map(s => s.trim()).filter(Boolean);
       if (list.length < 3) { K.beep('no'); return; }
       S.names = list.concat(['', '', '', '']).slice(0, 4); S.n = list.length; S.started = Date.now(); S.phase = 'rules';
+      S.len = Math.max(45, Math.min(180, Math.round(Number(S.len)) || 90));
     },
     next() {
       S.delta = null;
@@ -238,10 +261,14 @@
         if (S.i < D.CHARTER.length - 1) { S.i++; S.sub = 'read'; S.turn++; setTimer(T.charter); }
         else { S.phase = 'lots'; }
       }
-      else if (S.phase === 'lots') { S.order = D.orderFor(S.room); S.phase = 'crisis'; S.i = 0; S.sub = 'read'; S.turn++; setTimer(T.crisis); }
+      else if (S.phase === 'lots') { S.order = D.orderFor(S.room); S.phase = 'crisis'; S.i = 0; S.sub = 'read'; S.turn++; setTimer(T.crisis); fit(); }
       else if (S.phase === 'crisis' || S.phase === 'reckoning') { S.back = S.phase; afterOutcome(); }
       else if (S.phase === 'epilogue') { S.phase = 'reveal'; }
-      else if (S.phase === 'reveal') { S.phase = 'close'; S.sub = 'read'; setTimer(T.write); }
+      else if (S.phase === 'reveal') {
+        // The writing is optional: with too little of the session left, go straight to gems and slips.
+        const mins = live(), late = mins != null && mins + PACE.write + T.review / 60 > S.len + 2;
+        S.phase = 'close'; S.sub = late ? 'review' : 'read'; setTimer(late ? T.review : T.write);
+      }
       else if (S.phase === 'close') { if (S.sub === 'read') { S.sub = 'review'; setTimer(T.review); } else { S.phase = 'done'; } }
     },
     charter(id) {
@@ -257,9 +284,11 @@
     unanimous() { if (S.ask) resolve(S.ask); },
     'ask-no'() { S.ask = null; },
     sacrifice(id) {
-      S.g[id] = clamp(S.g[id] - 2); S.g[S.zero] = 2; S.zero = null; S.delta = null;
-      const again = D.GAUGES.map(g => g.id).find(x => S.g[x] <= 0);
-      if (again) { S.emergencies++; if (S.emergencies >= 2) { S.fell = true; S.phase = 'epilogue'; return; } S.zero = again; setTimer(T.emergency); return; }
+      // The gauge given up never drops below 1, so paying for one emergency cannot start another.
+      if (id) S.g[id] = Math.max(1, S.g[id] - 2);
+      S.g[S.zero] = 2; S.zero = null; S.delta = null;
+      const again = GID.find(x => S.g[x] <= 0);   // two gauges reached zero in the same vote
+      if (again) { alarm(again); return; }
       if (S.hold) { S.hold = false; S.phase = S.back; setTimer(T.crisis); return; }
       advance();
     },
@@ -277,6 +306,7 @@
     S.sure = false; fn(el.dataset.id); save(); render();
   });
   document.addEventListener('input', e => {
+    const len = e.target.closest('[data-len]'); if (len) { S.len = len.value; save(); return; }
     const el = e.target.closest('[data-name]'); if (!el) return;
     S.names[Number(el.dataset.name)] = el.value; save();
   });
@@ -292,6 +322,6 @@
   $('#tag').textContent = V === 'class' ? 'Class' : 'Rehearsal';
   $('#tag').className = 'tag ' + V;
   K.keepAwake();
-  K.sessionClock(() => S.started, 90);
+  K.sessionClock(() => S.started, () => S.len);
   render();
 })();

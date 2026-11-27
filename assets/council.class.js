@@ -1,10 +1,10 @@
-/* The Council — class scenario. A mountain valley, one year, nine decisions. */
+/* The Council — class scenario. A mountain valley, one year. */
 (function (root) {
   'use strict';
 
   const META = {
     title: 'The Free State of Tarn',
-    lead: 'A new country, one year, nine decisions. Bring pencils, paper and two coins each.',
+    lead: 'A new country and its first year. Bring pencils, paper and two coins each.',
     bill: 'The teachers, the road crews and the Guard have been paid.',
     verdicts: {
       fell: 'The government fell before the year was out.',

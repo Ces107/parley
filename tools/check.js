@@ -58,7 +58,7 @@ function council(v) {
 
   // Simulated play under two policies: blind (random votes) and careful (never votes a gauge to zero if it can help it).
   function simulate(careful) {
-    let falls = 0, emerg = 0;
+    let falls = 0, emerg = 0, most = 0;
     const games = 4000, sums = {};
     gids.forEach(k => { sums[k] = 0; });
     for (let t = 0; t < games; t++) {
@@ -68,32 +68,30 @@ function council(v) {
       const ap = fx => Object.keys(fx).forEach(k => { g[k] = Math.max(0, Math.min(10, g[k] + fx[k])); });
       const safe = o => Object.keys(o.fx).every(k => g[k] + o.fx[k] > 0);
       const choose = opts => { const pool = careful && opts.some(safe) ? opts.filter(safe) : opts; return pool[Math.floor(r() * pool.length)]; };
+      // As in the engine: the second emergency marks the government as fallen but the year is played out,
+      // and the gauge given up never drops below 1.
       const zero = () => {
-        for (const k of gids) {
-          if (g[k] <= 0) {
-            e++;
-            if (e >= 2) { fell = true; return; }
-            const o = gids.filter(x => x !== k).sort((x, y) => g[y] - g[x])[0];
-            g[o] = Math.max(0, g[o] - 2); g[k] = 2;
-          }
+        for (let k = gids.find(x => g[x] <= 0); k; k = gids.find(x => g[x] <= 0)) {
+          e++; if (e >= 2) fell = true;
+          const o = gids.filter(x => x !== k && g[x] >= 2).sort((x, y) => g[y] - g[x])[0];
+          if (o) g[o] = Math.max(1, g[o] - 2);
+          g[k] = 2;
         }
       };
       C.CHARTER.forEach(a => ap(a.options[Math.floor(r() * a.options.length)].fx));
       const ord = C.orderFor('sim' + t);
       for (let k = 0; k < ord.length; k++) {
-        if (C.BILLS.includes(k)) { ap({ [gids[0]]: -1 }); zero(); if (fell) break; }
+        if (C.BILLS.includes(k)) { ap({ [gids[0]]: -1 }); zero(); }
         ap(choose(C.CRISES[ord[k]].options).fx); zero();
-        if (fell) break;
       }
-      if (!fell) {
-        const low = gids.slice().sort((x, y) => g[x] - g[y])[0];
-        ap(choose(C.RECKONING[low].options).fx); zero();
-      }
+      const low = gids.slice().sort((x, y) => g[x] - g[y])[0];
+      ap(choose(C.RECKONING[low].options).fx); zero();
+      most = Math.max(most, e);
       if (fell) falls++;
       emerg += e;
       gids.forEach(k => { sums[k] += g[k]; });
     }
-    console.log(tag + (careful ? 'careful' : 'blind') + ' play: fell in ' + (100 * falls / games).toFixed(1) + '% of games; emergencies per game ' + (emerg / games).toFixed(2) +
+    console.log(tag + (careful ? 'careful' : 'blind') + ' play: fell in ' + (100 * falls / games).toFixed(1) + '% of games; emergencies per game ' + (emerg / games).toFixed(2) + ' (most ' + most + ')' +
       '; mean final ' + gids.map(k => k + ' ' + (sums[k] / games).toFixed(1)).join(', '));
   }
   simulate(false);

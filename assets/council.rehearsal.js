@@ -1,10 +1,10 @@
-/* The Council — content. A tiny island state, one year, nine decisions. */
+/* The Council — content. A tiny island state, one year. */
 (function (root) {
   'use strict';
 
   const META = {
     title: 'The Republic of Skerry',
-    lead: 'A new country, one year, nine decisions. Bring pencils, paper and two coins each.',
+    lead: 'A new country and its first year. Bring pencils, paper and two coins each.',
     bill: 'The teachers, the nurses and the ferry crew have been paid.',
     verdicts: {
       fell: 'The government fell before the year was out.',
